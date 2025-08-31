@@ -1,4 +1,4 @@
-import PrimaryButton from "../buttons/primaryButton";
+import PrimaryButton from "../buttons/PrimaryButton";
 
 const NotFound = () => {
   return (

@@ -1,11 +1,13 @@
-import Navbar from "@/components/openRoutes/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import { Outlet } from "react-router-dom";
 
 const OpenRoutes = () => {
   return (
     <div>
       <Navbar />
-      <Outlet />
+      <div>
+        <Outlet />
+      </div>
     </div>
   );
 };

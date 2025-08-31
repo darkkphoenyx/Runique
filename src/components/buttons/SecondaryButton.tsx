@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 
-const PrimaryButton = ({
+const SecondaryButton = ({
   title,
   link,
   className,
@@ -15,7 +15,7 @@ const PrimaryButton = ({
     <Link to={link}>
       <Button
         className={cn(
-          `bg-red-600 hover:bg-red-700 text-lg font-medium transition-all active:scale-95 cursor-pointer ${className}`
+          `bg-black hover:bg-black mt-6 rounded-lg font-medium active:scale-95 transition-all cursor-pointer ${className}`
         )}
       >
         {title}
@@ -24,4 +24,4 @@ const PrimaryButton = ({
   );
 };
 
-export default PrimaryButton;
+export default SecondaryButton;
