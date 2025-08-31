@@ -18,8 +18,12 @@ const HeroSection = () => {
             Unique shoes{" "}
             <span className=" text-yellow-400">for every run!</span>
           </p>
-          <div className="mt-8">
-            <SecondaryButton link="/shop" title="Buy Now" className="bg-white hover:bg-white text-black" />
+          <div className="mt-8 md:text-start text-center">
+            <SecondaryButton
+              link="/shop"
+              title="Buy Now"
+              className="bg-white hover:bg-white text-black"
+            />
           </div>
         </div>
         <img
