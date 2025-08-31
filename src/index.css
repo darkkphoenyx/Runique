@@ -163,3 +163,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+@font-face {
+  font-family: "Priestacy";
+  src: url("/Priestacy.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
