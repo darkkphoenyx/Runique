@@ -28,12 +28,12 @@ const HeroSection = () => {
         </div>
         <img
           data-aos="fade-down"
-          src="/assets/Hero/Hero.png"
+          src="/assets/Homepage/Hero/Hero.png"
           alt="hero section"
           className="object-cover md:relative absolute md:top-0 top-20 hidden md:block"
         />
         <img
-          src="/assets/Hero/Hero.png"
+          src="/assets/Homepage/Hero/Hero.png"
           alt="hero section"
           className="object-cover md:relative absolute top-7 block md:hidden scale-90"
         />
