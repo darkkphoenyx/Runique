@@ -1,3 +1,4 @@
+import InfiniteCarousel from "@/components/carousel/InfiniteCarousel";
 import DontMiss from "@/components/homepage/DontMiss";
 import FeatureSection from "@/components/homepage/FeatureSection";
 import HeroCTA from "@/components/homepage/HeroCTA";
@@ -16,6 +17,7 @@ const Homepage = () => {
       />
       <hr className="border border-black" />
       <FeatureSection />
+      <InfiniteCarousel />
       <DontMiss />
     </div>
   );

@@ -6,8 +6,6 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 
-import { ChevronDown } from "lucide-react";
-
 const footerData = [
   {
     id: 1,
