@@ -102,20 +102,22 @@ const CollectionSidebar = () => {
             <AccordionItem key={data.id} value={String(data.id)}>
               <AccordionTrigger
                 className={`text-lg hover:no-underline ${
-                  isDisabled && "hidden"
+                  isDisabled && "text-gray-400"
                 }`}
               >
                 {data.title}
               </AccordionTrigger>
               <AccordionContent
-                className={`flex flex-col gap-1 ${isDisabled && "hidden"}`}
+                className={`flex flex-col gap-1 ${
+                  isDisabled && "text-gray-400"
+                }`}
               >
                 <fieldset disabled={isDisabled} className="w-full">
                   {data.content.map((item) => (
                     <div
                       key={item}
-                      className={`flex gap-1.5 items-center cursor-pointer  ${
-                        isDisabled ? "cursor-not-allowed" : ""
+                      className={`flex gap-1.5 items-center ${
+                        isDisabled ? "cursor-not-allowed" : "cursor-pointer"
                       }`}
                       onClick={() =>
                         !isDisabled && handleFilterSelect(data.field, item)
