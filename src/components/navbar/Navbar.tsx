@@ -35,9 +35,9 @@ const Navbar = () => {
           ariaLabel: "Women collections",
         },
         {
-          label: "Kids",
-          href: "/collections/kids",
-          ariaLabel: "Kids collections",
+          label: "Unisex",
+          href: "/collections/unisex",
+          ariaLabel: "Women collections",
         },
       ],
     },

@@ -18,7 +18,6 @@ export class Products {
   // Services
   getProductDetails = async (filters: Record<string, string[]>) => {
     try {
-      const queries: string[][] = [];
       const allResults: any[] = [];
 
       const hasPriceFilter = filters.price && filters.price.length > 0;

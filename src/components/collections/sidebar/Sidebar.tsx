@@ -8,6 +8,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useProductStore } from "@/zustand/store";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const sidebarData = [
   {
@@ -31,6 +32,8 @@ const sidebarData = [
 ];
 
 const CollectionSidebar = () => {
+  const collectionId = useParams();
+  console.log(collectionId);
   const [selectedFilters, setSelectedFilters] = useState<
     Record<string, string[]>
   >({});
