@@ -20,19 +20,24 @@ const Navbar = () => {
       ],
     },
     {
-      label: "Projects",
+      label: "Collections",
       bgColor: "#170D27",
       textColor: "#fff",
       links: [
         {
-          label: "Featured",
-          href: "/projects/featured",
-          ariaLabel: "Featured Projects",
+          label: "Men",
+          href: "/collections/men",
+          ariaLabel: "Men collections",
         },
         {
-          label: "Case Studies",
-          href: "/projects/case-studies",
-          ariaLabel: "Project Case Studies",
+          label: "Women",
+          href: "/collections/women",
+          ariaLabel: "Women collections",
+        },
+        {
+          label: "Kids",
+          href: "/collections/kids",
+          ariaLabel: "Kids collections",
         },
       ],
     },

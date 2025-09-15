@@ -18,18 +18,22 @@ const HeroSection = () => {
             Unique shoes{" "}
             <span className=" text-yellow-400">for every run!</span>
           </p>
-          <div className="mt-8">
-            <SecondaryButton link="/shop" title="Buy Now" className="bg-white hover:bg-white text-black" />
+          <div className="mt-8 md:text-start text-center">
+            <SecondaryButton
+              link="/shop"
+              title="Buy Now"
+              className="bg-white hover:bg-white text-black"
+            />
           </div>
         </div>
         <img
           data-aos="fade-down"
-          src="/assets/Hero/Hero.png"
+          src="/assets/Homepage/Hero/Hero.png"
           alt="hero section"
           className="object-cover md:relative absolute md:top-0 top-20 hidden md:block"
         />
         <img
-          src="/assets/Hero/Hero.png"
+          src="/assets/Homepage/Hero/Hero.png"
           alt="hero section"
           className="object-cover md:relative absolute top-7 block md:hidden scale-90"
         />

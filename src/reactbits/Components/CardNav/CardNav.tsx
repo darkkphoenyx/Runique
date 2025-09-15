@@ -1,12 +1,9 @@
-/*
-	Installed from https://reactbits.dev/ts/tailwind/
-*/
-
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 // use your own icon import if react-icons is not available
 import { GoArrowUpRight } from "react-icons/go";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
+import { Link } from "react-router-dom";
 
 type CardNavLink = {
   label: string;
@@ -41,7 +38,6 @@ const CardNav: React.FC<CardNavProps> = ({
   items,
   className = "",
   ease = "power3.out",
-  baseColor = "#fff",
   menuColor,
   buttonText,
   buttonLink,
@@ -175,8 +171,7 @@ const CardNav: React.FC<CardNavProps> = ({
         ref={navRef}
         className={`card-nav ${
           isExpanded ? "open" : ""
-        } block h-[60px] p-0 rounded-xl shadow-md relative overflow-hidden will-change-[height]`}
-        style={{ backgroundColor: baseColor }}
+        } block h-[60px] p-0 rounded-xl bg-[#fafafb] shadow-md relative overflow-hidden will-change-[height]`}
       >
         <div className="card-nav-top absolute inset-x-0 top-0 h-[60px] flex items-center justify-between p-4 pl-[1.1rem] z-[2]">
           <div
@@ -202,7 +197,9 @@ const CardNav: React.FC<CardNavProps> = ({
           </div>
 
           <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 order-1 md:order-none">
-            <img src={logo} alt={logoAlt} className="logo h-[50px]" />
+            <Link to="/">
+              <img src={logo} alt={logoAlt} className="logo h-[50px]" />
+            </Link>
           </div>
 
           <PrimaryButton
