@@ -16,22 +16,69 @@ export class Products {
   }
 
   // Services
-  getProductDetails = async (type: string) => {
+  getProductDetails = async (filters: Record<string, string[]>) => {
     try {
-      if (type === "All") {
-        return await this.database.listDocuments(
-          config.appwriteDatabaseId,
-          config.appwriteCollectionId1
-        );
+      const queries: string[][] = [];
+      const allResults: any[] = [];
+
+      const hasPriceFilter = filters.price && filters.price.length > 0;
+      const otherFilters = { ...filters };
+      delete otherFilters.price;
+
+      // Generate queries for non-price filters
+      const baseFilterQueries: string[] = [];
+      for (const [key, values] of Object.entries(otherFilters)) {
+        if (values.length > 0) {
+          baseFilterQueries.push(Query.equal(key, values));
+        }
       }
-      return await this.database.listDocuments(
-        config.appwriteDatabaseId,
-        config.appwriteCollectionId1,
-        [Query.equal("gender", type)]
-      );
+
+      // If no price filter, just do a normal fetch
+      if (!hasPriceFilter) {
+        const res = await this.database.listDocuments(
+          config.appwriteDatabaseId,
+          config.appwriteCollectionId1,
+          baseFilterQueries
+        );
+        return res;
+      }
+
+      // Handle each price range as a separate query and merge the results
+      for (const label of filters.price) {
+        const priceQueries = [...baseFilterQueries];
+
+        switch (label) {
+          case "Under Rs. 4999":
+            priceQueries.push(Query.lessThan("price", 4999));
+            break;
+          case "Rs. 5000 - Rs. 14999":
+            priceQueries.push(Query.between("price", 5000, 14999));
+            break;
+          case "Above Rs.15000":
+            priceQueries.push(Query.greaterThan("price", 15000));
+            break;
+        }
+
+        const res = await this.database.listDocuments(
+          config.appwriteDatabaseId,
+          config.appwriteCollectionId1,
+          priceQueries
+        );
+
+        allResults.push(...(res?.documents || []));
+      }
+
+      // Remove duplicates (based on document ID)
+      const uniqueResultsMap: Record<string, any> = {};
+      for (const doc of allResults) {
+        uniqueResultsMap[doc.$id] = doc;
+      }
+
+      const uniqueResults = Object.values(uniqueResultsMap);
+      return { documents: uniqueResults };
     } catch (error) {
       throw new Error(
-        `Appwrite Error :: getProjectDetails() failed :: ${error}`
+        `Appwrite Error :: getProductDetails() failed :: ${error}`
       );
     }
   };

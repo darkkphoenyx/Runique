@@ -9,7 +9,7 @@ const CollectionWrapper = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const res = await products.getProductDetails("All");
+        const res = await products.getProductDetails({});
         const data: any = res?.documents || [];
         setProductData(data);
       } catch (error) {
