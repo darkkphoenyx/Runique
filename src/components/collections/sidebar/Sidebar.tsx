@@ -1,4 +1,3 @@
-import products from "@/appwrite/APIs";
 import {
   Accordion,
   AccordionContent,
@@ -6,9 +5,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useProductStore } from "@/zustand/store";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 const sidebarData = [
   {
@@ -31,14 +27,17 @@ const sidebarData = [
   },
 ];
 
-const CollectionSidebar = () => {
-  const collectionId = useParams();
-  console.log(collectionId);
-  const [selectedFilters, setSelectedFilters] = useState<
-    Record<string, string[]>
-  >({});
-  const setProductData = useProductStore((state) => state.setProductData);
+type CollectionSidebarProps = {
+  selectedFilters: Record<string, string[]>;
+  setSelectedFilters: React.Dispatch<
+    React.SetStateAction<Record<string, string[]>>
+  >;
+};
 
+const CollectionSidebar = ({
+  selectedFilters,
+  setSelectedFilters,
+}: CollectionSidebarProps) => {
   // Handle filter select/deselect
   const handleFilterSelect = (field: string, value: string) => {
     setSelectedFilters((prev) => {
@@ -71,45 +70,37 @@ const CollectionSidebar = () => {
     });
   };
 
-  // Fetch products based on filters
-  useEffect(() => {
-    const fetchFilteredProducts = async () => {
-      try {
-        console.log("Selected Filters:", selectedFilters);
-        const res = await products.getProductDetails(selectedFilters);
-        const data: any = res?.documents || [];
-        setProductData(data);
-      } catch (error) {
-        console.error("Error fetching filtered products:", error);
-      }
-    };
-
-    fetchFilteredProducts();
-  }, [selectedFilters]);
-
   const isGenderSelected = !!selectedFilters["gender"]?.length;
   const isKidsSelected = !!selectedFilters["kids"]?.length;
 
   return (
-    <div className="h-screen">
+    <div className="h-screen overflow-y-auto fixed lg:w-[185px] md:w-[350px] w-[265px]">
       <Accordion type="multiple" className="w-full">
         {sidebarData.map((data) => {
           const isDisabled =
             (data.field === "gender" && isKidsSelected) ||
             (data.field === "kids" && isGenderSelected);
 
+          // Calculate number of selected filters for this section
+          const selectedCount = selectedFilters[data.field]?.length || 0;
+
           return (
             <AccordionItem key={data.id} value={String(data.id)}>
               <AccordionTrigger
-                className={`text-lg hover:no-underline ${
-                  isDisabled && "text-gray-400"
+                className={`flex justify-between items-center text-lg hover:no-underline ${
+                  isDisabled ? "text-gray-400" : ""
                 }`}
               >
-                {data.title}
+                <span className="flex items-center gap-1">
+                  {data.title}{" "}
+                  <span className="text-sm">
+                    {selectedCount > 0 && `(${selectedCount})`}
+                  </span>
+                </span>
               </AccordionTrigger>
               <AccordionContent
                 className={`flex flex-col gap-1 ${
-                  isDisabled && "text-gray-400"
+                  isDisabled ? "text-gray-400" : ""
                 }`}
               >
                 <fieldset disabled={isDisabled} className="w-full">
