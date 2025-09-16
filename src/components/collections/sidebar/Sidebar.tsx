@@ -91,7 +91,7 @@ const CollectionSidebar = () => {
   const isKidsSelected = !!selectedFilters["kids"]?.length;
 
   return (
-    <div className="h-screen fixed w-[180px]">
+    <div className="h-screen">
       <Accordion type="multiple" className="w-full">
         {sidebarData.map((data) => {
           const isDisabled =

@@ -25,19 +25,9 @@ const Navbar = () => {
       textColor: "#fff",
       links: [
         {
-          label: "Men",
-          href: "/collections/men",
-          ariaLabel: "Men collections",
-        },
-        {
-          label: "Women",
-          href: "/collections/women",
-          ariaLabel: "Women collections",
-        },
-        {
-          label: "Unisex",
-          href: "/collections/unisex",
-          ariaLabel: "Women collections",
+          label: "Shop",
+          href: "/collections",
+          ariaLabel: "Shop",
         },
       ],
     },

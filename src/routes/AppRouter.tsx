@@ -12,7 +12,7 @@ const AppRouter = () => {
         <Routes>
           <Route element={<OpenRoutes />}>
             <Route path="/" element={<Homepage />} />
-            <Route path="/collections/:collectionId" element={<CollectionWrapper />} />
+            <Route path="/collections" element={<CollectionWrapper />} />
           </Route>
           {/* not found */}
           <Route path="*" element={<NotFound />} />
