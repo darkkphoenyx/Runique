@@ -5,4 +5,7 @@ export interface IProductCard {
   description: string;
   colorAvailable: string[];
   price: number;
+  gender?: string;
+  kids?: string;
+  sizes: number[];
 }

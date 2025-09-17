@@ -82,6 +82,49 @@ export class Products {
     }
   };
 
+  //search by title
+  getProductByTitle = async (title: string) => {
+    try {
+      const res = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId1,
+        [Query.equal("title", title)]
+      );
+
+      if (res.documents.length > 0) {
+        return res.documents[0];
+      } else {
+        return null;
+      }
+    } catch (error) {
+      throw new Error("Error getting product by title");
+    }
+  };
+
+  //get feature1 section
+  getProductsByCategoryName = async (name: string) => {
+    const categoryRes = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId2, // categories collection
+      [Query.equal("name", name)]
+    );
+
+    const categoryId = categoryRes.documents[0]?.$id;
+
+    if (!categoryId) {
+      console.warn(`Category "${name}" not found.`);
+      return [];
+    }
+
+    const productRes = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId1, // products collection
+      [Query.equal("categories", categoryId)]
+    );
+
+    return productRes.documents;
+  };
+
   //to get the pdf download link
   getFileDownload = async () => {
     try {

@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import CollectionRight from "./CollectionRight";
 import products from "@/appwrite/APIs";
 import { useProductStore } from "@/zustand/store";
-import CollectionSidebar from "@/components/collections/sidebar/Sidebar";
+import CollectionSidebar from "@/components/collections/sidebar/CollectionSidebar";
 import { SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import ScrollToTopOnRouteChange from "@/shared/ScrollToTopOnRouteChange";
 
 const CollectionWrapper = () => {
   const setProductData = useProductStore((state) => state.setProductData);
@@ -35,6 +36,7 @@ const CollectionWrapper = () => {
   return (
     <div className="md:pt-[100px] pt-[70px] flex max-w-[1600px] mx-auto pb-10 transition-all duration-500 px-4">
       {/* Sidebar on Desktop */}
+      <ScrollToTopOnRouteChange />
       <div className="hidden lg:block w-[20%] pr-4">
         <CollectionSidebar
           selectedFilters={selectedFilters}

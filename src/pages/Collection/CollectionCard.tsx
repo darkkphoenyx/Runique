@@ -5,10 +5,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { IProductCard } from "@/interfaces/IProduct";
+import { useNavigate } from "react-router-dom";
 
 const CollectionCard = ({ data }: { data: IProductCard }) => {
+  const navigate = useNavigate();
+  const handleProductNavigation = (title: string) => {
+    navigate(`/p/${encodeURIComponent(title)}`);
+  };
   return (
-    <Card className="p-0 rounded-none gap-0 border-none shadow-none cursor-pointer active:scale-[98%] transition-all duration-300">
+    <Card
+      onClick={() => handleProductNavigation(data.title)}
+      className="p-0 rounded-none gap-0 border-none shadow-none cursor-pointer active:scale-[98%] transition-all duration-300"
+    >
       <img
         className="w-full min-h-max object-cover"
         src={data.imgUrl}

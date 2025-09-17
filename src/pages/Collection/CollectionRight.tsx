@@ -1,6 +1,6 @@
 import CollectionCard from "./CollectionCard";
 import { useProductStore } from "@/zustand/store";
-import CollectionCardSkeleton from "./CollectionCardSkeleton";
+import CollectionCardSkeleton from "../../components/skeletons/CollectionCardSkeleton";
 
 interface CollectionRightProps {
   isLoading: boolean;

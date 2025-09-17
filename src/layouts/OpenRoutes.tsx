@@ -20,7 +20,7 @@ const OpenRoutes = () => {
             </div>
           </div>
         </div>
-      </div>
+    </div>
     </div>
   );
 };

@@ -15,7 +15,7 @@ const PrimaryButton = ({
     <Link to={link}>
       <Button
         className={cn(
-          `bg-red-600 hover:bg-red-700 text-lg font-medium transition-all active:scale-95 cursor-pointer ${className}`
+          `bg-red-600 hover:bg-red-700 text-lg font-medium transition-all active:scale-95 cursor-pointer w-full  ${className}`
         )}
       >
         {title}

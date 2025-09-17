@@ -26,7 +26,7 @@ const Navbar = () => {
       links: [
         {
           label: "Shop",
-          href: "/collections",
+          href: "/shop",
           ariaLabel: "Shop",
         },
       ],
