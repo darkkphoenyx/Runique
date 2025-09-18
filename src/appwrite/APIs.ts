@@ -1,6 +1,5 @@
 import { Client, Databases, ID, Query, Storage } from "appwrite";
 import config from "../config/config";
-// import type { ContactForm } from "../pages/sections/ContactForm";
 
 export class Products {
   client = new Client();
@@ -111,6 +110,8 @@ export class Products {
 
     const categoryId = categoryRes.documents[0]?.$id;
 
+    console.log(categoryId);
+
     if (!categoryId) {
       console.warn(`Category "${name}" not found.`);
       return [];
@@ -118,13 +119,22 @@ export class Products {
 
     const productRes = await this.database.listDocuments(
       config.appwriteDatabaseId,
-      config.appwriteCollectionId1, // products collection
+      config.appwriteCollectionId1,
       [Query.equal("categories", categoryId)]
     );
 
     return productRes.documents;
   };
 
+  getRelatedProductsPerCategory = async (category: string) => {
+    const res = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId1,
+      [Query.equal("categories", category)]
+    );
+
+    return res.documents;
+  };
   //to get the pdf download link
   getFileDownload = async () => {
     try {

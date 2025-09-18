@@ -1,70 +1,86 @@
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { IProductCard } from "@/interfaces/IProduct";
 import { useProductStore } from "@/zustand/store";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import products from "@/appwrite/APIs";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import ProductDetailsSkeleton from "@/components/skeletons/ProductDetailsSkeleton";
 import ShoesSizeGrid from "./ShoesSizeGrid";
+import PhotoCarousel from "./PhotoCarousel";
+import ProductExtraDetails from "./ProductExtraDetails";
+import RelatedProducts from "./RelatedProducts";
 
-const mapApiResponseToProductCard = (res: any): IProductCard => {
-  return {
-    title: res.title,
-    description: res.description,
-    imgUrl: res.imgUrl,
-    header: res.header,
-    colorAvailable: res.colorAvailable,
-    price: res.price,
-    sizes: res.sizes,
-    gender: res.gender,
-    kids: res.kids,
-  };
-};
+const mapApiResponseToProductCard = (res: any): IProductCard => ({
+  title: res.title,
+  description: res.description,
+  imgUrl: res.imgUrl,
+  header: res.header,
+  colorAvailable: res.colorAvailable,
+  price: res.price,
+  sizes: res.sizes,
+  gender: res.gender,
+  kids: res.kids,
+  categories: res.categories,
+  type: res.type,
+});
 
 const ProductDetailWrapper = () => {
   const { title } = useParams<{ title: string }>();
-  const [data, setData] = useState<IProductCard | undefined>();
   const productData = useProductStore((state) => state.productData);
+
+  const [data, setData] = useState<IProductCard | undefined>();
+  const [activeImageUrl, setActiveImageUrl] = useState<string>();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   useEffect(() => {
+    if (data?.imgUrl?.length) {
+      setActiveImageUrl(data.imgUrl[0]);
+    }
+  }, [data]);
+
+  useEffect(() => {
     if (!title) return;
 
     let isMounted = true;
 
-    const matchedProduct = productData.find((item) => item.title === title);
+    const loadProduct = async () => {
+      const localProduct = productData.find((item) => item.title === title);
 
-    if (matchedProduct) {
-      setData(matchedProduct);
-    } else {
-      const fetchProduct = async () => {
-        try {
-          const res = await products.getProductByTitle(title);
-          if (isMounted) {
-            if (res) {
-              const mapped = mapApiResponseToProductCard(res);
-              setData(mapped);
-            } else {
-              setData(undefined);
-            }
-          }
-        } catch (error) {
-          console.error("Failed to fetch product:", error);
-          if (isMounted) setData(undefined);
+      if (localProduct) {
+        setData(localProduct);
+        return;
+      }
+
+      try {
+        const res = await products.getProductByTitle(title);
+        if (isMounted && res) {
+          setData(mapApiResponseToProductCard(res));
         }
-      };
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+        if (isMounted) setData(undefined);
+      }
+    };
 
-      fetchProduct();
-    }
+    loadProduct();
 
     return () => {
       isMounted = false;
     };
   }, [title, productData]);
+
+  const handleImageClick = useCallback((url: string) => {
+    setActiveImageUrl(url);
+  }, []);
 
   if (!data) {
     return (
@@ -76,20 +92,41 @@ const ProductDetailWrapper = () => {
 
   return (
     <div className="pt-[100px] px-4 h-full">
-      <div className="grid md:grid-cols-2 justify-center gap-8 max-w-[900px] mx-auto">
-        <div className="border-none h-fit sticky top-10 bg-red-600 flex max-md:justify-center w-full shadow-none p-0 rounded-lg">
+      <div className="grid lg:grid-cols-2 justify-center max-w-[1000px] mx-auto">
+        {/* Left Section - Image Gallery */}
+        <div className="w-full hidden border-none h-fit sticky top-10 lg:flex max-md:justify-center shadow-none p-0 rounded-lg">
+          <div className="flex w-[20%] flex-col gap-2 sticky h-fit top-10">
+            {data.imgUrl.map((image) => (
+              <div key={image} className="relative h-14 w-14">
+                {activeImageUrl === image && (
+                  <div className="absolute top-0 left-0 h-full w-full bg-black/40 rounded-lg z-10" />
+                )}
+                <img
+                  onClick={() => handleImageClick(image)}
+                  className="h-14 w-14 cursor-pointer object-cover rounded-lg"
+                  src={image}
+                  alt={data.title}
+                />
+              </div>
+            ))}
+          </div>
           <img
-            className="lg:h-[450px] md:h-[400px] h-auto w-[520px] object-cover rounded-lg"
-            src={data.imgUrl}
+            className="lg:h-[530px] md:h-[400px] h-auto w-[520px] object-cover rounded-lg"
+            src={activeImageUrl || data.imgUrl[0]}
             alt={data.title}
           />
         </div>
-        <Card className="border-none shadow-none p-0 gap-0 md:w-[90%] w-[100%] mx-auto">
+
+        {/* Right Section - Product Info */}
+        <Card className="border-none shadow-none p-0 gap-0 lg:w-[90%] w-[100%] mx-auto">
           <div>
-            <CardTitle className="md:text-xl text-lg">{data.title}</CardTitle>
-            <CardDescription className="text-sm">
-              {data.description}
-            </CardDescription>
+            <CardHeader className="text-red-600 font-medium p-0 text-sm">
+              {data.header}
+            </CardHeader>
+            <CardTitle className="md:text-xl text-lg -mt-2">
+              {data.title}
+            </CardTitle>
+            <CardDescription className="text-sm">{data.type}</CardDescription>
             <p className="mt-2 text-lg font-medium">MRP: {data.price}</p>
             <p className="mt-2 text-xs text-gray-500">
               Inclusive of all taxes <br />
@@ -97,10 +134,13 @@ const ProductDetailWrapper = () => {
             </p>
           </div>
 
-          {/* size cards */}
+          {/* only tablet and mobile view */}
+          <div className="block lg:hidden">
+            <PhotoCarousel images={data.imgUrl} />
+          </div>
           <ShoesSizeGrid sizeData={data.sizes} />
 
-          <div className="mt-[40px] w-full border flex flex-col gap-y-2">
+          <div className="mt-[40px] w-full flex flex-col gap-y-2">
             <PrimaryButton
               title="Add to Bag"
               link=""
@@ -112,31 +152,38 @@ const ProductDetailWrapper = () => {
               className="bg-white text-black text-sm border border-black w-full py-6"
             />
           </div>
+
+          {/* description and color options */}
           <div className="mt-8">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-            Repudiandae perferendis consequuntur omnis sunt inventore velit
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus,
-            doloribus! Quidem, qui. Laboriosam nihil quod qui, placeat veritatis
-            beatae deleniti! Ut nostrum laborum aspernatur laudantium molestiae
-            eius animi autem et voluptatum. Modi illo aliquam, deleniti rem
-            omnis doloremque voluptates aspernatur doloribus maxime accusamus,
-            dicta expedita esse eligendi sunt ad recusandae aperiam possimus
-            saepe minima at. Sit animi quasi totam saepe adipisci? Suscipit
-            assumenda eaque pariatur qui sunt odit eos perferendis reprehenderit
-            consectetur ab? Sapiente totam autem iure repellat eos sunt delectus
-            perspiciatis pariatur ut. Porro recusandae sapiente harum magni
-            rerum, quae corporis numquam quas laborum, adipisci accusamus?
-            Molestiae, dolorem repudiandae? mollitia dolore vel maxime maiores!
-            <div className="grid grid-cols-2 mt-4">
+            <CardDescription className="text-base text-black">
+              {data.description ? (
+                data.description
+              ) : (
+                <p className="text-center text-sm text-gray-500 mb-8">
+                  This product is excluded from site <br /> promotions and
+                  discounts.
+                </p>
+              )}
+            </CardDescription>
+
+            <div className="flex gap-8 mt-4 font-medium">
               <p>Colors Available:</p>
-              <ul style={{ listStyleType: "disc" }}>
+              <ul className="list-disc ml-5">
                 {data.colorAvailable.map((color) => (
                   <li key={color}>{color}</li>
                 ))}
               </ul>
             </div>
           </div>
+
+          {/* extra details accordion*/}
+          <ProductExtraDetails />
         </Card>
+      </div>
+
+      {/* related products */}
+      <div>
+        <RelatedProducts category={data.categories} />
       </div>
     </div>
   );

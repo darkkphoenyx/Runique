@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Accordion,
   AccordionContent,
@@ -75,10 +75,21 @@ const footerData = [
   },
 ];
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }, 200);
+  };
   return (
     <div className="bg-[#fcfbfa]">
       <div className="py-10 grid lg:grid-cols-2">
-        <Link to={"/"}>
+        <Link to={"/"} onClick={() => handleNavigation("/")}>
           <div className="flex lg:justify-start justify-center">
             <img
               src="/assets/Logo/RuniqueLogo.png"
@@ -95,7 +106,11 @@ const Footer = () => {
               <h2 className="text-black font-medium">{nav.title}</h2>
               <ul className="mt-8 flex gap-4 flex-col">
                 {nav.links.map((link) => (
-                  <Link key={link.link} to={link.link}>
+                  <Link
+                    key={link.link}
+                    to={link.link}
+                    onClick={() => handleNavigation(link.link)}
+                  >
                     <li className="text-gray-600 hover:text-gray-800">
                       {link.title}
                     </li>

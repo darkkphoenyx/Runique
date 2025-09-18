@@ -1,11 +1,13 @@
 export interface IProductCard {
-  imgUrl: string;
-  header: string;
   title: string;
+  header: string;
   description: string;
-  colorAvailable: string[];
   price: number;
+  colorAvailable: string[];
   gender?: string;
   kids?: string;
   sizes: number[];
+  categories: string;
+  imgUrl: string[];
+  type: string;
 }
