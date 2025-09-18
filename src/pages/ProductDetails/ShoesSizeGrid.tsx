@@ -4,8 +4,8 @@ const ShoesSizeGrid = ({ sizeData }: { sizeData: number[] }) => {
   const [isSelected, setIsSelected] = useState<number | null>(null);
 
   const handleSizeSelect = (size: number) => {
-    setIsSelected(size);
-    console.log("Selected size:", size); // Log the correct, clicked size
+    if (size === isSelected) setIsSelected(null);
+    else setIsSelected(size);
   };
 
   return (
@@ -18,7 +18,7 @@ const ShoesSizeGrid = ({ sizeData }: { sizeData: number[] }) => {
             key={size}
             className={`font-medium cursor-pointer w-full border rounded-md py-2 hover:border-black ${
               isSelected === size
-                ? "bg-red-500 text-white border-none"
+                ? "bg-red-600 text-white border-none"
                 : " border-gray-300"
             }`}
           >

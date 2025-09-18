@@ -1,6 +1,12 @@
+"use client"; // If you're using Next.js App Router
+
+import { useEffect, useState } from "react";
 import CardNav from "@/reactbits/Components/CardNav/CardNav";
 
 const Navbar = () => {
+  const [hideNavbar, setHideNavbar] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const items = [
     {
       label: "About",
@@ -23,13 +29,7 @@ const Navbar = () => {
       label: "Collections",
       bgColor: "#170D27",
       textColor: "#fff",
-      links: [
-        {
-          label: "Shop",
-          href: "/shop",
-          ariaLabel: "Shop",
-        },
-      ],
+      links: [{ label: "Shop", href: "/shop", ariaLabel: "Shop" }],
     },
     {
       label: "Contact",
@@ -55,8 +55,30 @@ const Navbar = () => {
     },
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY) {
+        setHideNavbar(true);
+      } else {
+        setHideNavbar(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   return (
-    <div className="sticky top-0 z-50">
+    <div
+      className={`fixed top-0 left-0 w-full z-50 transition-transform duration-300 ${
+        hideNavbar ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <CardNav
         logo={"/assets/Logo/RuniqueLogo.png"}
         logoAlt="Company Logo"

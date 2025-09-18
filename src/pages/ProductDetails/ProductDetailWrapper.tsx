@@ -75,11 +75,11 @@ const ProductDetailWrapper = () => {
   }
 
   return (
-    <div className="pt-[140px] min-h-screen px-4">
+    <div className="pt-[100px] px-4 h-full">
       <div className="grid md:grid-cols-2 justify-center gap-8 max-w-[900px] mx-auto">
-        <div className="border-none flex max-md:justify-center w-full shadow-none p-0 rounded-lg">
+        <div className="border-none h-fit sticky top-10 bg-red-600 flex max-md:justify-center w-full shadow-none p-0 rounded-lg">
           <img
-            className="h-auto w-[520px] object-cover rounded-lg"
+            className="lg:h-[450px] md:h-[400px] h-auto w-[520px] object-cover rounded-lg"
             src={data.imgUrl}
             alt={data.title}
           />
@@ -112,10 +112,29 @@ const ProductDetailWrapper = () => {
               className="bg-white text-black text-sm border border-black w-full py-6"
             />
           </div>
-          <div className="">
+          <div className="mt-8">
             Lorem ipsum dolor, sit amet consectetur adipisicing elit.
             Repudiandae perferendis consequuntur omnis sunt inventore velit
-            mollitia dolore vel maxime maiores!
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus,
+            doloribus! Quidem, qui. Laboriosam nihil quod qui, placeat veritatis
+            beatae deleniti! Ut nostrum laborum aspernatur laudantium molestiae
+            eius animi autem et voluptatum. Modi illo aliquam, deleniti rem
+            omnis doloremque voluptates aspernatur doloribus maxime accusamus,
+            dicta expedita esse eligendi sunt ad recusandae aperiam possimus
+            saepe minima at. Sit animi quasi totam saepe adipisci? Suscipit
+            assumenda eaque pariatur qui sunt odit eos perferendis reprehenderit
+            consectetur ab? Sapiente totam autem iure repellat eos sunt delectus
+            perspiciatis pariatur ut. Porro recusandae sapiente harum magni
+            rerum, quae corporis numquam quas laborum, adipisci accusamus?
+            Molestiae, dolorem repudiandae? mollitia dolore vel maxime maiores!
+            <div className="grid grid-cols-2 mt-4">
+              <p>Colors Available:</p>
+              <ul style={{ listStyleType: "disc" }}>
+                {data.colorAvailable.map((color) => (
+                  <li key={color}>{color}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </Card>
       </div>
