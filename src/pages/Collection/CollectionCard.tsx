@@ -19,7 +19,7 @@ const CollectionCard = ({ data }: { data: IProductCard }) => {
     >
       <img
         className="w-full min-h-max object-cover"
-        src={data.imgUrl}
+        src={data.imgUrl[0]}
         alt="card image"
       />
       <CardHeader className="md:mt-3 mt-2 text-red-600 font-medium p-0 max-sm:text-xs">
@@ -30,7 +30,7 @@ const CollectionCard = ({ data }: { data: IProductCard }) => {
           {data.title}
         </CardTitle>
         <CardDescription className="md:text-base text-xs">
-          {data.description}
+          {data.type}
         </CardDescription>
         <CardDescription className="md:text-base text-sm">
           {data.colorAvailable.length} Colour

@@ -60,9 +60,9 @@ const InfiniteCarouselByCategory = ({ category }: { category: string }) => {
               <Card className="p-0 rounded-2xl">
                 <CardContent
                   className="flex aspect-square items-center justify-center p-6 rounded-2xl bg-cover bg-center"
-                  style={{ backgroundImage: `url(${card.imgUrl})` }}
+                  style={{ backgroundImage: `url(${card.imgUrl[0]})` }}
                 >
-                  <p className="text-white text-center text-lg mt-auto font-medium">
+                  <p className="text-black text-center text-lg mt-auto font-medium">
                     {card.title}
                   </p>
                 </CardContent>

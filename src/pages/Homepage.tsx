@@ -17,7 +17,7 @@ const Homepage = () => {
       />
       <hr className="border border-black" />
       <FeatureSection />
-      <InfiniteCarouselByCategory category="Icons"/>
+      <InfiniteCarouselByCategory category="Icons" />
       <DontMiss />
     </div>
   );
