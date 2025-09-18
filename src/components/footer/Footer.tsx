@@ -76,7 +76,7 @@ const footerData = [
 ];
 const Footer = () => {
   return (
-    <>
+    <div className="bg-[#fcfbfa]">
       <div className="py-10 grid lg:grid-cols-2">
         <Link to={"/"}>
           <div className="flex lg:justify-start justify-center">
@@ -149,7 +149,7 @@ const Footer = () => {
           </li>
         </ul>
       </div>
-    </>
+    </div>
   );
 };
 
