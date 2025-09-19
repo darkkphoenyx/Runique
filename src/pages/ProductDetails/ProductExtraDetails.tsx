@@ -132,7 +132,7 @@ const ProductExtraDetails = () => {
 
           <p className="mt-8">
             Marketed by: Runique Global Trading B.V. Nepal Branch, Mitrapark -
-            Kathmandu,
+            Kathmandu, Nepal.
           </p>
           <p className="font-semibold mt-4">Net Quantity: 1 Pair</p>
         </AccordionContent>

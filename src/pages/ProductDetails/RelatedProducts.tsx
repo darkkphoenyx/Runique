@@ -11,7 +11,13 @@ import { useProductStore } from "@/zustand/store";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const RelatedProducts = ({ category }: { category: string }) => {
+const RelatedProducts = ({
+  category,
+  title,
+}: {
+  category: string;
+  title: string;
+}) => {
   const featuredProductData = useProductStore(
     (state) => state.featuredProductData
   );
@@ -51,7 +57,7 @@ const RelatedProducts = ({ category }: { category: string }) => {
   };
 
   return (
-    <div className="px-4 mt-28">
+    <div className="lg:mt-28 md:mt-10 mt-16">
       <div>
         <h2 className="md:text-3xl text-2xl font-medium">
           You Might Also Like
@@ -64,30 +70,32 @@ const RelatedProducts = ({ category }: { category: string }) => {
             className="w-full mx-auto relative border-b-2 pb-10 mb-10"
           >
             <CarouselContent className="mt-4">
-              {featuredProductData.map((card) => (
-                <CarouselItem
-                  key={card.title}
-                  className="lg:basis-1/3 md:basis-1/2"
-                >
-                  <div
-                    onClick={() => handleNavigation(card.title)}
-                    className="p-1 cursor-pointer"
+              {featuredProductData
+                .filter((card) => card.title !== title)
+                .map((card) => (
+                  <CarouselItem
+                    key={card.title}
+                    className="lg:basis-1/3 md:basis-1/2"
                   >
-                    <Card className="p-0 rounded-2xl border-none shadow-none">
-                      <CardContent className="flex flex-col aspect-square  p-0 rounded-2xl bg-cover bg-center">
-                        <img src={card.imgUrl[0]} alt={card.title} />
-                        <div>
-                          <p className="text-black text-base mt-auto font-medium">
-                            {card.title}
-                          </p>
-                          <CardDescription>{card.type}</CardDescription>
-                          <p className="font-semibold">MRP: {card.price}</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CarouselItem>
-              ))}
+                    <div
+                      onClick={() => handleNavigation(card.title)}
+                      className="p-1 cursor-pointer"
+                    >
+                      <Card className="p-0 rounded-xl border-none shadow-none">
+                        <CardContent className="flex flex-col aspect-square  p-0 rounded-2xl bg-cover bg-center">
+                          <img className="rounded-xl" src={card.imgUrl[0]} alt={card.title} />
+                          <div className="mt-4">
+                            <p className="text-black text-base mt-auto font-medium">
+                              {card.title}
+                            </p>
+                            <CardDescription>{card.type}</CardDescription>
+                            <p className="font-semibold">MRP: {card.price}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
             </CarouselContent>
             <CarouselPrevious className="absolute top-[40%] md:left-20 left-10 h-10  w-10 transform shadow-2xl bg-white" />
             <CarouselNext className="absolute top-[40%] md:right-20 right-10 h-10  w-10 transform" />

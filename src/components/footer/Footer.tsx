@@ -87,8 +87,8 @@ const Footer = () => {
     }, 200);
   };
   return (
-    <div className="bg-[#fcfbfa]">
-      <div className="py-10 grid lg:grid-cols-2">
+    <div className="bg-[#fcfbfa] pb-4">
+      <div className="py-15 grid lg:grid-cols-2">
         <Link to={"/"} onClick={() => handleNavigation("/")}>
           <div className="flex lg:justify-start justify-center">
             <img

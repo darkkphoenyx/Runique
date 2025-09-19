@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
+import CollectionBreadcrumb from "@/pages/Collection/CollectionBreadCrumb";
 
 const sidebarData = [
   {
@@ -75,6 +76,7 @@ const CollectionSidebar = ({
 
   return (
     <div className="h-screen overflow-y-auto fixed lg:w-[185px] md:w-[350px] w-[265px]">
+      <CollectionBreadcrumb />
       <Accordion type="multiple" className="w-full">
         {sidebarData.map((data) => {
           const isDisabled =
