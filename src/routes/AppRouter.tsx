@@ -1,4 +1,5 @@
 import NotFound from "@/components/openRoutes/NotFound";
+import FooterEffectWrapper from "@/layouts/FooterEffectWrapper";
 import OpenRoutes from "@/layouts/OpenRoutes";
 import ScrollWrapper from "@/layouts/ScrollWrapper";
 import CollectionWrapper from "@/pages/Collection/CollectionsWrapper";
@@ -13,10 +14,13 @@ const AppRouter = () => {
         {/* open routes */}
         <Routes>
           <Route element={<OpenRoutes />}>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/shop" element={<CollectionWrapper />} />
+            {/* these routes have a footer effect, so separated */}
+            <Route element={<FooterEffectWrapper />}>
+              <Route path="/" element={<Homepage />} />
+            </Route>
             {/* scroll to top wrapper */}
             <Route element={<ScrollWrapper />}>
+              <Route path="/shop" element={<CollectionWrapper />} />
               <Route path="/p/:title" element={<ProductDetailWrapper />} />
             </Route>
           </Route>

@@ -15,6 +15,7 @@ import ShoesSizeGrid from "./ShoesSizeGrid";
 import PhotoCarousel from "./PhotoCarousel";
 import ProductExtraDetails from "./ProductExtraDetails";
 import RelatedProducts from "./RelatedProducts";
+import ProductBreadcrumb from "./ProductBreadCrumb";
 
 const mapApiResponseToProductCard = (res: any): IProductCard => ({
   title: res.title,
@@ -92,6 +93,7 @@ const ProductDetailWrapper = () => {
 
   return (
     <div className="pt-[100px] px-4 h-full">
+      <ProductBreadcrumb title={data.title} />
       <div className="grid lg:grid-cols-2 justify-center max-w-[1000px] mx-auto">
         {/* Left Section - Image Gallery */}
         <div className="w-full hidden border-none h-fit sticky top-10 lg:flex max-md:justify-center shadow-none p-0 rounded-lg">
@@ -166,7 +168,7 @@ const ProductDetailWrapper = () => {
               )}
             </CardDescription>
 
-            <div className="flex gap-8 mt-4 font-medium">
+            <div className="flex gap-8 mt-8 font-medium">
               <p>Colors Available:</p>
               <ul className="list-disc ml-5">
                 {data.colorAvailable.map((color) => (
@@ -183,7 +185,7 @@ const ProductDetailWrapper = () => {
 
       {/* related products */}
       <div>
-        <RelatedProducts category={data.categories} />
+        <RelatedProducts category={data.categories} title={data.title} />
       </div>
     </div>
   );

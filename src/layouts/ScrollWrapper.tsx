@@ -1,3 +1,4 @@
+import Footer from "@/components/footer/Footer";
 import ScrollToTopOnRouteChange from "@/shared/ScrollToTopOnRouteChange";
 import { Outlet } from "react-router-dom";
 
@@ -6,6 +7,7 @@ const ScrollWrapper = () => {
     <div>
       <ScrollToTopOnRouteChange />
       <Outlet />
+      <Footer />
     </div>
   );
 };
