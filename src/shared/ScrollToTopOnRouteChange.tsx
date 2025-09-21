@@ -16,8 +16,7 @@ const ScrollToTopOnRouteChange = () => {
         custom.scrollTop = 0;
       }
     };
-
-    const timeout = setTimeout(scroll, 300);
+    const timeout = setTimeout(scroll, 150);
 
     return () => clearTimeout(timeout);
   }, [pathname]);
