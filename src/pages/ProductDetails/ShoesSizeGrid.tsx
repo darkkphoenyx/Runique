@@ -18,7 +18,7 @@ const ShoesSizeGrid = ({ sizeData }: { sizeData: number[] }) => {
   const selectedSize = watch("size");
 
   const onSubmit = (data: FormData) => {
-    
+    console.log(data);
   };
 
   const selectSize = (size: number) =>
