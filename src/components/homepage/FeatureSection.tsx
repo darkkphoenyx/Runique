@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import SecondaryButton from "../buttons/SecondaryButton";
 
 const FeatureCardDetails = [
@@ -42,31 +43,32 @@ const FeatureSection = () => {
         </h1>
         <div className="grid md:grid-cols-2 mt-8 cursor-pointer">
           {FeatureCardDetails.map((card) => (
-            <div
-              data-aos="zoom-in"
-              data-aos-delay="50"
-              key={card.id}
-              className="relative w-full lg:h-[600px] md:h-[500px] h-[300px] bg-cover bg-center"
-              style={{ backgroundImage: `url(${card.img})` }}
-            >
+            <Link key={card.id} to={card.link}>
               <div
-                data-aos="fade-up"
+                data-aos="zoom-in"
                 data-aos-delay="50"
-                className="absolute bottom-10 md:left-20 left-5 text-white"
+                key={card.id}
+                className="relative w-full lg:h-[600px] md:h-[500px] h-[300px] bg-cover bg-center"
+                style={{ backgroundImage: `url(${card.img})` }}
               >
-                <p className="md:text-base text-sm font-medium">
-                  {card.header}
-                </p>
-                <h2 className="md:text-2xl text-xl font-medium mt-2">
-                  {card.title}
-                </h2>
-                <SecondaryButton
-                  link={card.link}
-                  title="Shop"
-                  className="bg-white text-black hover:bg-white mt-4"
-                />
+                <div
+                  data-aos="fade-up"
+                  data-aos-delay="50"
+                  className="absolute bottom-10 md:left-20 left-5 text-white"
+                >
+                  <p className="md:text-base text-sm font-medium">
+                    {card.header}
+                  </p>
+                  <h2 className="md:text-2xl text-xl font-medium mt-2">
+                    {card.title}
+                  </h2>
+                  <SecondaryButton
+                    title="Shop"
+                    className="bg-white text-black hover:bg-white mt-4"
+                  />
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

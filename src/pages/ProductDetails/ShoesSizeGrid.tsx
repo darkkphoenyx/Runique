@@ -16,7 +16,7 @@ const ShoesSizeGrid = ({ sizeData }: { sizeData: number[] }) => {
           <button
             onClick={() => handleSizeSelect(size)}
             key={size}
-            className={`font-medium cursor-pointer w-full border rounded-md py-2 hover:border-black ${
+            className={`font-medium cursor-pointer w-full border rounded-md py-2 hover:border-black active:scale-95 transition-all ${
               isSelected === size
                 ? "bg-red-600 text-white border-none"
                 : " border-gray-300"
