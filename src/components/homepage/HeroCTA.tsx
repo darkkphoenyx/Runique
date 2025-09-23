@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import SecondaryButton from "../buttons/SecondaryButton";
 
 const HeroCTA = ({
@@ -34,7 +35,9 @@ const HeroCTA = ({
           {desc}
         </p>
         <div data-aos="fade-up" data-aos-delay="70">
-          <SecondaryButton link={link} title={btnText} />
+          <Link to={link}>
+            <SecondaryButton title={btnText} />
+          </Link>
         </div>
       </div>
     </div>

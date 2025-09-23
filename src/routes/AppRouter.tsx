@@ -5,6 +5,7 @@ import ScrollWrapper from "@/layouts/ScrollWrapper";
 import CollectionWrapper from "@/pages/Collection/CollectionsWrapper";
 
 import Homepage from "@/pages/Homepage";
+import { Login } from "@/pages/login/Login";
 import ProductDetailWrapper from "@/pages/ProductDetails/ProductDetailWrapper";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 const AppRouter = () => {
@@ -24,6 +25,7 @@ const AppRouter = () => {
               <Route path="/p/:title" element={<ProductDetailWrapper />} />
             </Route>
           </Route>
+          <Route path="/login" element={<Login />} />
           {/* not found */}
           <Route path="*" element={<NotFound />} />
         </Routes>
