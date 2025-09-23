@@ -172,12 +172,12 @@ export class Products {
   };
 
   //search by title
-  getProductByTitle = async (title: string) => {
+  getProductByTitle = async (slug: string) => {
     try {
       const res = await this.database.listDocuments(
         config.appwriteDatabaseId,
         config.appwriteCollectionId1,
-        [Query.equal("title", title)]
+        [Query.equal("slug", slug)]
       );
 
       if (res.documents.length > 0) {

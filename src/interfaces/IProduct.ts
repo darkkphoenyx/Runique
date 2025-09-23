@@ -10,4 +10,5 @@ export interface IProductCard {
   categories: string;
   imgUrl: string[];
   type: string;
+  slug: string;
 }
