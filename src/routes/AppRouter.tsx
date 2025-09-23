@@ -1,6 +1,7 @@
 import NotFound from "@/components/openRoutes/NotFound";
 import FooterEffectWrapper from "@/layouts/FooterEffectWrapper";
 import OpenRoutes from "@/layouts/OpenRoutes";
+import ProtectedRoutes from "@/layouts/ProtectedRoutes";
 import ScrollWrapper from "@/layouts/ScrollWrapper";
 import CollectionWrapper from "@/pages/Collection/CollectionsWrapper";
 
@@ -24,6 +25,9 @@ const AppRouter = () => {
               <Route path="/shop" element={<CollectionWrapper />} />
               <Route path="/p/:title" element={<ProductDetailWrapper />} />
             </Route>
+
+            {/* protected routes */}
+            <Route element={<ProtectedRoutes />}></Route>
           </Route>
           <Route path="/login" element={<Login />} />
           {/* not found */}

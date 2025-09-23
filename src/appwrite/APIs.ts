@@ -23,7 +23,7 @@ export class Products {
       const res = await this.database.listDocuments(
         config.appwriteDatabaseId,
         config.appwriteCollectionId3,
-        [Query.equal("email", email), Query.select(["password"])]
+        [Query.equal("email", email), Query.select(["password", "role"])]
       );
 
       // If no user is found, throw an explicit error
@@ -39,6 +39,15 @@ export class Products {
       if (!isMatch) {
         throw new Error("Invalid password.");
       }
+
+      //local storage session handling
+
+      localStorage.setItem("isLogin", "true");
+
+      //checking admin
+      if (res.documents[0].role === "Admin")
+        localStorage.setItem("isAdmin", "true");
+      else localStorage.removeItem("isAdmin");
 
       return { success: true };
     } catch (error: any) {
