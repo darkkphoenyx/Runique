@@ -6,14 +6,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useNavigate } from "react-router-dom";
 
 const PhotoCarousel = ({ images }: { images: string[] }) => {
-  const navigate = useNavigate();
-
-  const handleNavigation = (title: string) => {
-    navigate(`/p/${encodeURIComponent(title)}`);
-  };
   return (
     <Carousel
       opts={{
@@ -24,10 +18,7 @@ const PhotoCarousel = ({ images }: { images: string[] }) => {
       <CarouselContent className="mt-4">
         {images.map((image, index) => (
           <CarouselItem className="md:basis-1/2" key={index}>
-            <div
-              onClick={() => handleNavigation(image)}
-              className="p-1 cursor-pointer"
-            >
+            <div className="p-1 cursor-pointer">
               <Card className="p-0 rounded-xl">
                 <img src={image} alt={`${index}image`} className="rounded-xl" />
               </Card>

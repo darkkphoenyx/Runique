@@ -1,4 +1,6 @@
+import TextType from "@/reactbits/TextType/TextType";
 import SecondaryButton from "../buttons/SecondaryButton";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -11,19 +13,28 @@ const HeroSection = () => {
           <h2 className="md:text-[128px] text-6xl text-white font-extrabold md:text-start text-center">
             RUN<span className="text-yellow-300">I</span>QUE
           </h2>
-          <p
-            className="lg:text-6xl text-4xl mt-4 italic md:text-start text-center"
+          <div
+            className="lg:text-6xl md:text-4xl cursor-default text-3xl mt-4 italic md:text-start text-center"
             style={{ fontFamily: "Priestacy" }}
           >
             Unique shoes{" "}
-            <span className=" text-yellow-400">for every run!</span>
-          </p>
+            <span className=" text-yellow-400">
+              <TextType
+                text={["for every run!", "for every hustle!"]}
+                typingSpeed={100}
+                pauseDuration={1500}
+                showCursor={true}
+                cursorCharacter="|"
+              />
+            </span>
+          </div>
           <div className="mt-8 md:text-start text-center">
-            <SecondaryButton
-              link="/shop"
-              title="Buy Now"
-              className="bg-white hover:bg-white text-black"
-            />
+            <Link to={"/shop"}>
+              <SecondaryButton
+                title="Buy Now"
+                className="bg-white hover:bg-white text-black"
+              />
+            </Link>
           </div>
         </div>
         <img

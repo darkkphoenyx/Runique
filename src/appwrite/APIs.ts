@@ -1,5 +1,6 @@
-import { Client, Databases, ID, Query, Storage } from "appwrite";
+import { Account, Client, Databases, ID, Query, Storage } from "appwrite";
 import config from "../config/config";
+import bcrypt from "bcryptjs";
 
 export class Products {
   client = new Client();
@@ -14,7 +15,87 @@ export class Products {
     this.storage = new Storage(this.client);
   }
 
+  account = new Account(this.client);
+
   // Services
+  login = async ({ email, password }: { email: string; password: string }) => {
+    try {
+      const res = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId3,
+        [Query.equal("email", email), Query.select(["password"])]
+      );
+
+      // If no user is found, throw an explicit error
+      if (res.documents.length === 0) {
+        console.log("No user found");
+        throw new Error("No user found with this email.");
+      }
+
+      const storedPassword = res.documents[0].password; //this is hash password
+
+      const isMatch = await bcrypt.compare(password, storedPassword);
+
+      if (!isMatch) {
+        throw new Error("Invalid password.");
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      if (error.code === 401) {
+        throw new Error("Unauthorized: Invalid email or password.");
+      }
+
+      throw new Error(`${error.message}`);
+    }
+  };
+
+  signup = async ({
+    name,
+    email,
+    password,
+    confirmPassword,
+  }: {
+    name?: string;
+    email: string;
+    password: string;
+    confirmPassword?: string;
+  }) => {
+    try {
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match.");
+      }
+
+      const existing = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId3,
+        [Query.equal("email", email)]
+      );
+
+      if (existing.documents.length > 0) {
+        throw new Error("A user with this email already exists.");
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const res = await this.database.createDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId3,
+        ID.unique(),
+        {
+          name: name || "",
+          email,
+          password: hashedPassword,
+        }
+      );
+
+      return res;
+    } catch (error: any) {
+      console.error("Signup error:", error.message || error);
+      throw new Error(error.message || "Signup failed.");
+    }
+  };
+
   getProductDetails = async (filters: Record<string, string[]>) => {
     try {
       const allResults: any[] = [];

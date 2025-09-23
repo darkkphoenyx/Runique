@@ -20,9 +20,9 @@ const DontMiss = () => {
         </div>
 
         <HeroCTA
+          link="/shop"
           btnText="Shop All Tenis"
           title="PRESSURE-TESTED, <br/> PRO-APPROVED."
-          link="/shop/tennis"
           desc="Serve grand slam styles, inspired by tennis' bests like Aryna Sabalenka."
         />
       </div>
