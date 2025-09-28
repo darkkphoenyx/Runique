@@ -17,7 +17,8 @@ import ProductExtraDetails from "./ProductExtraDetails";
 import RelatedProducts from "./RelatedProducts";
 import ProductBreadcrumb from "./ProductBreadCrumb";
 
-const mapApiResponseToProductCard = (res: any): IProductCard => ({
+const mapApiResponseToProductCard = (res: IProductCard): IProductCard => ({
+  id: res.id,
   title: res.title,
   description: res.description,
   imgUrl: res.imgUrl,
@@ -63,7 +64,7 @@ const ProductDetailWrapper = () => {
       }
 
       try {
-        const res = await products.getProductByTitle(slug);
+        const res: any = await products.getProductByTitle(slug);
         if (isMounted && res) {
           setData(mapApiResponseToProductCard(res));
         }
@@ -141,7 +142,13 @@ const ProductDetailWrapper = () => {
           <div className="block lg:hidden">
             <PhotoCarousel images={data.imgUrl} />
           </div>
-          <ShoesSizeGrid sizeData={data.sizes} />
+
+          {/* product booking is here */}
+          <ShoesSizeGrid
+            price={data.price}
+            productId={data.id}
+            sizeData={data.sizes}
+          />
 
           <div className="mt-[40px] w-full flex flex-col gap-y-2">
             <PrimaryButton

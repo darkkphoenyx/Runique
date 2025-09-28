@@ -45,11 +45,11 @@ const CollectionSidebar = ({
       const currentValues = prev[field] || [];
       const alreadySelected = currentValues.includes(value);
 
-      let updatedValues = alreadySelected
+      const updatedValues = alreadySelected
         ? currentValues.filter((v) => v !== value)
         : [...currentValues, value];
 
-      let updatedFilters = {
+      const updatedFilters = {
         ...prev,
         [field]: updatedValues,
       };

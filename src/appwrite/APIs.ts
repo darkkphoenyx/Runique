@@ -1,4 +1,4 @@
-import { Account, Client, Databases, ID, Query, Storage } from "appwrite";
+import { Client, Databases, ID, Query, Storage } from "appwrite";
 import config from "../config/config";
 import bcrypt from "bcryptjs";
 
@@ -15,21 +15,24 @@ export class Products {
     this.storage = new Storage(this.client);
   }
 
-  account = new Account(this.client);
+  // Services logic
 
-  // Services
+  //login
   login = async ({ email, password }: { email: string; password: string }) => {
     try {
+      let id = "";
       const res = await this.database.listDocuments(
         config.appwriteDatabaseId,
         config.appwriteCollectionId3,
-        [Query.equal("email", email), Query.select(["password", "role"])]
+        [Query.equal("email", email), Query.select(["$id", "password", "role"])]
       );
 
       // If no user is found, throw an explicit error
       if (res.documents.length === 0) {
         console.log("No user found");
         throw new Error("No user found with this email.");
+      } else if (res.total > 0) {
+        id = res.documents[0].$id;
       }
 
       const storedPassword = res.documents[0].password; //this is hash password
@@ -41,7 +44,6 @@ export class Products {
       }
 
       //local storage session handling
-
       localStorage.setItem("isLogin", "true");
 
       //checking admin
@@ -49,7 +51,18 @@ export class Products {
         localStorage.setItem("isAdmin", "true");
       else localStorage.removeItem("isAdmin");
 
-      return { success: true };
+      //fetch user details
+      try {
+        const res = await this.database.getDocument(
+          config.appwriteDatabaseId,
+          config.appwriteCollectionId3,
+          id,
+          [Query.select(["$id", "name", "email", "role"])]
+        );
+        return res;
+      } catch (error) {
+        throw new Error(`User data not fetched: ${error}`);
+      }
     } catch (error: any) {
       if (error.code === 401) {
         throw new Error("Unauthorized: Invalid email or password.");
@@ -59,6 +72,7 @@ export class Products {
     }
   };
 
+  //signup
   signup = async ({
     name,
     email,
@@ -105,6 +119,7 @@ export class Products {
     }
   };
 
+  //get prodcts details and filter also
   getProductDetails = async (filters: Record<string, string[]>) => {
     try {
       const allResults: any[] = [];
@@ -186,11 +201,11 @@ export class Products {
         return null;
       }
     } catch (error) {
-      throw new Error("Error getting product by title");
+      throw new Error(`Error getting product by title: ${error}`);
     }
   };
 
-  //get feature1 section
+  //get featured section
   getProductsByCategoryName = async (name: string) => {
     const categoryRes = await this.database.listDocuments(
       config.appwriteDatabaseId,
@@ -199,8 +214,6 @@ export class Products {
     );
 
     const categoryId = categoryRes.documents[0]?.$id;
-
-    console.log(categoryId);
 
     if (!categoryId) {
       console.warn(`Category "${name}" not found.`);
@@ -216,6 +229,7 @@ export class Products {
     return productRes.documents;
   };
 
+  //get related product
   getRelatedProductsPerCategory = async (category: string) => {
     const res = await this.database.listDocuments(
       config.appwriteDatabaseId,
@@ -225,39 +239,34 @@ export class Products {
 
     return res.documents;
   };
-  //to get the pdf download link
-  getFileDownload = async () => {
-    try {
-      return this.storage.getFileDownload(
-        config.appwriteBucketId,
-        "689794480032fa61a2ea"
-      );
-    } catch (error) {
-      throw new Error("Error getting PDF download.");
-    }
-  };
 
-  // to upload comments
-  writeComments = async ({
-    name,
-    message,
-    phone,
-    email,
-  }: {
-    name: string;
-    message: string;
-    phone: string;
-    email: string;
-  }) => {
+  //update order status
+  orderItems = async (
+    userId: string,
+    productId: string,
+    quantity: number,
+    size: number,
+    price: number
+  ) => {
     try {
-      return this.database.createDocument(
+      if (!size) throw new Error("Select size");
+      const res = await this.database.createDocument(
         config.appwriteDatabaseId,
-        config.appwriteCollectionId3,
+        config.appwriteCollectionId4,
         ID.unique(),
-        { name, message, phone, email }
+        {
+          price: price * quantity,
+          users: userId,
+          products: productId,
+          quantity: quantity,
+          size: size,
+        }
       );
-    } catch (error) {
-      throw new Error(`Error commenting:: ${error}`);
+
+      return res;
+    } catch (error: any) {
+      console.error("Order placing failed:", error);
+      throw new Error(error.message);
     }
   };
 }
