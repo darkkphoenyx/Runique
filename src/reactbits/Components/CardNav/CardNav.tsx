@@ -1,9 +1,17 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-// use your own icon import if react-icons is not available
 import { GoArrowUpRight } from "react-icons/go";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { Link } from "react-router-dom";
+import { CircleUser } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import ProfileDetails from "@/pages/login/ProfileDetails";
 
 type CardNavLink = {
   label: string;
@@ -162,9 +170,11 @@ const CardNav: React.FC<CardNavProps> = ({
     if (el) cardsRef.current[i] = el;
   };
 
+  const showLogin = localStorage.getItem("isLogin");
+
   return (
     <div
-      className={`card-nav-container  mx-auto w-full z-[99] pt-4 px-4 ${className}`}
+      className={`card-nav-container mx-auto w-full z-[99] pt-4 px-4 ${className}`}
     >
       <nav
         ref={navRef}
@@ -201,11 +211,36 @@ const CardNav: React.FC<CardNavProps> = ({
             </Link>
           </div>
 
-          <PrimaryButton
-            link={buttonLink}
-            className="card-nav-cta-button hidden md:inline-flex border-0 rounded-lg px-4 py-2 h-full font-medium cursor-pointer transition-colors duration-300 items-center"
-            title={buttonText}
-          />
+          <div className="md:block hidden">
+            {!showLogin ? (
+              <PrimaryButton
+                link={buttonLink}
+                className="card-nav-cta-button hidden md:inline-flex border-0 rounded-lg px-4 py-2 h-full font-medium cursor-pointer transition-colors duration-300 items-center"
+                title={buttonText}
+              />
+            ) : (
+              <div>
+                <Sheet>
+                  <SheetTrigger>
+                    <CircleUser
+                      color="red"
+                      className="cursor-pointer active:scale-90 transition-all duration-300"
+                      size={36}
+                    />
+                    <SheetContent className="md:p-4 p-2 gap-2">
+                      <SheetTitle className="md:text-2xl text-xl text-red-500">
+                        User Details
+                      </SheetTitle>
+                      <SheetDescription className="hidden">
+                        This is user details section
+                      </SheetDescription>
+                      <ProfileDetails />
+                    </SheetContent>
+                  </SheetTrigger>
+                </Sheet>
+              </div>
+            )}
+          </div>
         </div>
 
         <div
@@ -244,6 +279,38 @@ const CardNav: React.FC<CardNavProps> = ({
               </div>
             </div>
           ))}
+
+          {/* for mobile only */}
+          <div className="md:hidden flex items-center justify-center">
+            {!showLogin ? (
+              <PrimaryButton
+                link={buttonLink}
+                className="card-nav-cta-button hidden md:inline-flex border-0 rounded-lg px-4 py-2 h-full font-medium cursor-pointer transition-colors duration-300 items-center"
+                title={buttonText}
+              />
+            ) : (
+              <div>
+                <Sheet>
+                  <SheetTrigger>
+                    <CircleUser
+                      color="red"
+                      className="cursor-pointer active:scale-90 transition-all duration-300"
+                      size={36}
+                    />
+                    <SheetContent className="md:p-4 p-2 gap-2">
+                      <SheetTitle className="md:text-2xl text-xl text-red-500">
+                        User Details
+                      </SheetTitle>
+                      <SheetDescription className="hidden">
+                        This is user details section
+                      </SheetDescription>
+                      <ProfileDetails />
+                    </SheetContent>
+                  </SheetTrigger>
+                </Sheet>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
     </div>
