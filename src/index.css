@@ -166,9 +166,12 @@
   }
 }
 
+/* priestacy font */
 @font-face {
   font-family: "Priestacy";
-  src: url("/Priestacy.otf") format("truetype");
+  src: url("/fonts/Priestacy.woff2") format("woff2"),
+    url("/fonts/Priestacy.woff") format("woff");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }

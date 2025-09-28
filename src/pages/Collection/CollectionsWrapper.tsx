@@ -22,8 +22,14 @@ const CollectionWrapper = () => {
       setIsLoading(true);
       try {
         const res = await products.getProductDetails(selectedFilters);
-        const data: any = res?.documents || [];
-        setProductData(data);
+        const rawData: any[] = res?.documents || [];
+
+        const mappedData = rawData.map((doc) => ({
+          ...doc,
+          id: doc.$id,
+        }));
+
+        setProductData(mappedData);
       } catch (error) {
         console.error("Failed to fetch filtered products:", error);
       } finally {

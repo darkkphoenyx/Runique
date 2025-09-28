@@ -23,7 +23,7 @@ const AppRouter = () => {
             {/* scroll to top wrapper */}
             <Route element={<ScrollWrapper />}>
               <Route path="/shop" element={<CollectionWrapper />} />
-              <Route path="/p/:title" element={<ProductDetailWrapper />} />
+              <Route path="/p/:slug" element={<ProductDetailWrapper />} />
             </Route>
 
             {/* protected routes */}

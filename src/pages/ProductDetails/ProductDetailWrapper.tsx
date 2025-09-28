@@ -17,7 +17,8 @@ import ProductExtraDetails from "./ProductExtraDetails";
 import RelatedProducts from "./RelatedProducts";
 import ProductBreadcrumb from "./ProductBreadCrumb";
 
-const mapApiResponseToProductCard = (res: any): IProductCard => ({
+const mapApiResponseToProductCard = (res: IProductCard): IProductCard => ({
+  id: res.id,
   title: res.title,
   description: res.description,
   imgUrl: res.imgUrl,
@@ -29,10 +30,11 @@ const mapApiResponseToProductCard = (res: any): IProductCard => ({
   kids: res.kids,
   categories: res.categories,
   type: res.type,
+  slug: res.slug,
 });
 
 const ProductDetailWrapper = () => {
-  const { title } = useParams<{ title: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const productData = useProductStore((state) => state.productData);
 
   const [data, setData] = useState<IProductCard | undefined>();
@@ -49,12 +51,12 @@ const ProductDetailWrapper = () => {
   }, [data]);
 
   useEffect(() => {
-    if (!title) return;
+    if (!slug) return;
 
     let isMounted = true;
 
     const loadProduct = async () => {
-      const localProduct = productData.find((item) => item.title === title);
+      const localProduct = productData.find((item) => item.slug === slug);
 
       if (localProduct) {
         setData(localProduct);
@@ -62,7 +64,7 @@ const ProductDetailWrapper = () => {
       }
 
       try {
-        const res = await products.getProductByTitle(title);
+        const res: any = await products.getProductByTitle(slug);
         if (isMounted && res) {
           setData(mapApiResponseToProductCard(res));
         }
@@ -77,7 +79,7 @@ const ProductDetailWrapper = () => {
     return () => {
       isMounted = false;
     };
-  }, [title, productData]);
+  }, [slug, productData]);
 
   const handleImageClick = useCallback((url: string) => {
     setActiveImageUrl(url);
@@ -140,7 +142,13 @@ const ProductDetailWrapper = () => {
           <div className="block lg:hidden">
             <PhotoCarousel images={data.imgUrl} />
           </div>
-          <ShoesSizeGrid sizeData={data.sizes} />
+
+          {/* product booking is here */}
+          <ShoesSizeGrid
+            price={data.price}
+            productId={data.id}
+            sizeData={data.sizes}
+          />
 
           <div className="mt-[40px] w-full flex flex-col gap-y-2">
             <PrimaryButton
@@ -185,7 +193,7 @@ const ProductDetailWrapper = () => {
 
       {/* related products */}
       <div>
-        <RelatedProducts category={data.categories} title={data.title} />
+        <RelatedProducts category={data.categories} slug={data.slug} />
       </div>
     </div>
   );

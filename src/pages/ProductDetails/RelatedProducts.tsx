@@ -13,10 +13,10 @@ import { useNavigate } from "react-router-dom";
 
 const RelatedProducts = ({
   category,
-  title,
+  slug,
 }: {
   category: string;
-  title: string;
+  slug: string;
 }) => {
   const featuredProductData = useProductStore(
     (state) => state.featuredProductData
@@ -52,8 +52,8 @@ const RelatedProducts = ({
     return <p className="px-4">No related products found.</p>;
   }
 
-  const handleNavigation = (title: string) => {
-    navigate(`/p/${encodeURIComponent(title)}`);
+  const handleNavigation = (slug: string) => {
+    navigate(`/p/${encodeURIComponent(slug)}`);
   };
 
   return (
@@ -71,19 +71,23 @@ const RelatedProducts = ({
           >
             <CarouselContent className="mt-4">
               {featuredProductData
-                .filter((card) => card.title !== title)
+                .filter((card) => card.slug !== slug)
                 .map((card) => (
                   <CarouselItem
-                    key={card.title}
+                    key={card.slug}
                     className="lg:basis-1/3 md:basis-1/2"
                   >
                     <div
-                      onClick={() => handleNavigation(card.title)}
+                      onClick={() => handleNavigation(card.slug)}
                       className="p-1 cursor-pointer"
                     >
                       <Card className="p-0 rounded-xl border-none shadow-none">
                         <CardContent className="flex flex-col aspect-square  p-0 rounded-2xl bg-cover bg-center">
-                          <img className="rounded-xl" src={card.imgUrl[0]} alt={card.title} />
+                          <img
+                            className="rounded-xl"
+                            src={card.imgUrl[0]}
+                            alt={card.title}
+                          />
                           <div className="mt-4">
                             <p className="text-black text-base mt-auto font-medium">
                               {card.title}

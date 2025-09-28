@@ -15,7 +15,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import SecondaryButton from "@/components/buttons/SecondaryButton";
+import { useProductStore } from "@/zustand/store";
 import products from "@/appwrite/APIs";
+import type { IUser } from "@/interfaces/IUser";
 
 // Zod Schemas
 const loginSchema = z.object({
@@ -40,6 +42,8 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const setUserData = useProductStore((state) => state.setUserData);
+  const userData = useProductStore((state) => state.userData);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -65,7 +69,17 @@ export function Login() {
 
     try {
       if (isLogin) {
-        await products.login(values);
+        const loginResult = await products.login(values);
+
+        const res: IUser = {
+          id: loginResult.$id,
+          name: loginResult.name,
+          email: loginResult.email,
+          role: loginResult.role,
+        };
+
+        //keeping the user data in userData store
+        setUserData(res);
         toast.success("Signed in successfully!");
         navigate(-1);
       } else {

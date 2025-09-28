@@ -33,8 +33,8 @@ const InfiniteCarouselByCategory = ({ category }: { category: string }) => {
     fetchFeatureProducts();
   }, []);
 
-  const handleNavigation = (title: string) => {
-    navigate(`/p/${encodeURIComponent(title)}`);
+  const handleNavigation = (slug: string) => {
+    navigate(`/p/${encodeURIComponent(slug)}`);
   };
   return (
     <Carousel
@@ -54,7 +54,7 @@ const InfiniteCarouselByCategory = ({ category }: { category: string }) => {
         {featuredProductData.map((card) => (
           <CarouselItem key={card.title} className="md:basis-1/3 lg:basis-1/5">
             <div
-              onClick={() => handleNavigation(card.title)}
+              onClick={() => handleNavigation(card.slug)}
               className="p-1 cursor-pointer"
             >
               <Card className="p-0 rounded-2xl">

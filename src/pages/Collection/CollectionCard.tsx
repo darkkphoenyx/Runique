@@ -9,12 +9,12 @@ import { useNavigate } from "react-router-dom";
 
 const CollectionCard = ({ data }: { data: IProductCard }) => {
   const navigate = useNavigate();
-  const handleProductNavigation = (title: string) => {
-    navigate(`/p/${encodeURIComponent(title)}`);
+  const handleProductNavigation = (slug: string) => {
+    navigate(`/p/${encodeURIComponent(slug)}`);
   };
   return (
     <Card
-      onClick={() => handleProductNavigation(data.title)}
+      onClick={() => handleProductNavigation(data.slug)}
       className="p-0 rounded-none gap-0 border-none shadow-none cursor-pointer active:scale-[98%] transition-all duration-300"
     >
       <img

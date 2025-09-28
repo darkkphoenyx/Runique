@@ -21,7 +21,7 @@ const CollectionRight = ({ isLoading }: CollectionRightProps) => {
         {isLoading
           ? renderSkeletons()
           : productData.map((card) => (
-              <CollectionCard key={card.title} data={card} />
+              <CollectionCard key={card.id} data={card} />
             ))}
       </div>
 
