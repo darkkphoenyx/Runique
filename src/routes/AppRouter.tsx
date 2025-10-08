@@ -7,6 +7,7 @@ import CollectionWrapper from "@/pages/Collection/CollectionsWrapper";
 
 import Homepage from "@/pages/Homepage";
 import { Login } from "@/pages/login/Login";
+import ProfileDetails from "@/pages/login/ProfileDetails";
 import ProductDetailWrapper from "@/pages/ProductDetails/ProductDetailWrapper";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 const AppRouter = () => {
@@ -27,7 +28,9 @@ const AppRouter = () => {
             </Route>
 
             {/* protected routes */}
-            <Route element={<ProtectedRoutes />}></Route>
+            <Route element={<ProtectedRoutes />}>
+              <Route path="/profile" element={<ProfileDetails />} />
+            </Route>
           </Route>
           <Route path="/login" element={<Login />} />
           {/* not found */}

@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 
 const SecondaryButton = ({
   title,
-
   className,
 }: {
   title: string;

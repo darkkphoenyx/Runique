@@ -77,7 +77,7 @@ const CollectionSidebar = ({
   return (
     <div className="h-screen overflow-y-auto fixed lg:w-[185px] md:w-[350px] w-[265px]">
       <CollectionBreadcrumb />
-      <Accordion type="multiple" className="w-full">
+      <Accordion type="multiple" className="w-full" defaultValue={["1"]}>
         {sidebarData.map((data) => {
           const isDisabled =
             (data.field === "gender" && isKidsSelected) ||
