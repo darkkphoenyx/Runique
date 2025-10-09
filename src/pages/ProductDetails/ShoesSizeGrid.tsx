@@ -1,4 +1,5 @@
 import products from "@/appwrite/APIs";
+import { fetchCartData } from "@/utils/FetchCartItem";
 import { useProductStore } from "@/zustand/store";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +35,8 @@ const ShoesSizeGrid = ({
   const userData = useProductStore((state) => state.userData);
   const selectedSize = watch("size");
   const navigate = useNavigate();
+  const setBagData = useProductStore((state) => state.setBagData);
+  const userId = userData?.id || "";
 
   const onSubmit = async (data: FormData) => {
     if (localStorage.getItem("isLogin") !== "true") {
@@ -55,6 +58,9 @@ const ShoesSizeGrid = ({
         price
       );
       toast.success("Added to bag!");
+      // updating the cart items
+      const cartData = await fetchCartData(userId);
+      setBagData(cartData);
     } catch (error: any) {
       toast.error(error.message);
       console.error("Booking failed", error);

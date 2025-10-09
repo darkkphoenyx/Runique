@@ -205,6 +205,20 @@ export class Products {
     }
   };
 
+  // get product by id
+  getProductById = async (id: string) => {
+    try {
+      const res = await this.database.getDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId4,
+        id
+      );
+      return res;
+    } catch (error) {
+      throw new Error(`Error getting product by ID: ${error}`);
+    }
+  };
+
   //get featured section
   getProductsByCategoryName = async (name: string) => {
     const categoryRes = await this.database.listDocuments(
@@ -250,20 +264,95 @@ export class Products {
   ) => {
     try {
       if (!size) throw new Error("Select size");
-      const res = await this.database.createDocument(
+
+      const duplicateOrder = await this.database.listDocuments(
         config.appwriteDatabaseId,
         config.appwriteCollectionId4,
-        ID.unique(),
-        {
-          price: price * quantity,
-          users: userId,
-          products: productId,
-          quantity: quantity,
-          size: size,
-        }
+        [
+          Query.equal("users", userId),
+          Query.equal("products", productId),
+          Query.equal("size", size),
+        ]
       );
 
-      return res;
+      // checking if duplicate data exists
+
+      //here we are checking the productId, userID and the size-> cause each size should count as a different order even tho the user and products are exactly the same
+      if (duplicateOrder.total > 0) {
+        const res = await this.database.updateDocument(
+          config.appwriteDatabaseId,
+          config.appwriteCollectionId4,
+          duplicateOrder.documents[0].$id,
+          {
+            price: price * Math.abs(quantity), //forcing positive quantity
+            users: userId,
+            products: productId,
+            quantity: duplicateOrder.documents[0].quantity + quantity,
+            size: size,
+          }
+        );
+
+        return res;
+      } else {
+        const res = await this.database.createDocument(
+          config.appwriteDatabaseId,
+          config.appwriteCollectionId4,
+          ID.unique(),
+          {
+            price: price * quantity,
+            users: userId,
+            products: productId,
+            quantity: quantity,
+            size: size,
+          }
+        );
+        return res;
+      }
+    } catch (error: any) {
+      console.error("Order placing failed:", error);
+      throw new Error(error.message);
+    }
+  };
+
+  // Function to increase the quantity
+  increaseQuantity = async (
+    userId: string,
+    productId: string,
+    size: number,
+    price: number
+  ) => {
+    try {
+      return await this.orderItems(userId, productId, 1, size, price);
+    } catch (error: any) {
+      console.error("Failed to increase quantity:", error);
+      throw new Error(error.message);
+    }
+  };
+
+  // Function to decrease the quantity
+  decreaseQuantity = async (
+    userId: string,
+    productId: string,
+    size: number,
+    price: number
+  ) => {
+    try {
+      return await this.orderItems(userId, productId, -1, size, price);
+    } catch (error: any) {
+      console.error("Failed to decrease quantity:", error);
+      throw new Error(error.message);
+    }
+  };
+
+  // fetch bag item
+  fetchBag = async (userId: string) => {
+    try {
+      const res = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId4,
+        [Query.equal("users", userId)]
+      );
+      return res.documents;
     } catch (error: any) {
       console.error("Order placing failed:", error);
       throw new Error(error.message);

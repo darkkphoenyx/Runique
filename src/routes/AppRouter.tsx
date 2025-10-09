@@ -3,6 +3,7 @@ import FooterEffectWrapper from "@/layouts/FooterEffectWrapper";
 import OpenRoutes from "@/layouts/OpenRoutes";
 import ProtectedRoutes from "@/layouts/ProtectedRoutes";
 import ScrollWrapper from "@/layouts/ScrollWrapper";
+import Bag from "@/pages/Bag/Bag";
 import CollectionWrapper from "@/pages/Collection/CollectionsWrapper";
 
 import Homepage from "@/pages/Homepage";
@@ -30,6 +31,7 @@ const AppRouter = () => {
             {/* protected routes */}
             <Route element={<ProtectedRoutes />}>
               <Route path="/profile" element={<ProfileDetails />} />
+              <Route path="/cart" element={<Bag />} />
             </Route>
           </Route>
           <Route path="/login" element={<Login />} />

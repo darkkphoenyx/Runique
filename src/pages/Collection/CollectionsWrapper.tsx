@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import CollectionRight from "./CollectionRight";
-import products from "@/appwrite/APIs";
 import { useProductStore } from "@/zustand/store";
 import CollectionSidebar from "@/components/collections/sidebar/CollectionSidebar";
 import { SlidersHorizontal } from "lucide-react";
@@ -8,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import ScrollToTopOnRouteChange from "@/shared/ScrollToTopOnRouteChange";
 import CollectionBreadcrumb from "./CollectionBreadCrumb";
+import { fetchProductDetail } from "@/utils/FetchProductDetails";
 
 const CollectionWrapper = () => {
   const setProductData = useProductStore((state) => state.setProductData);
@@ -21,14 +21,7 @@ const CollectionWrapper = () => {
     const fetchFilteredProducts = async () => {
       setIsLoading(true);
       try {
-        const res = await products.getProductDetails(selectedFilters);
-        const rawData: any[] = res?.documents || [];
-
-        const mappedData = rawData.map((doc) => ({
-          ...doc,
-          id: doc.$id,
-        }));
-
+        const mappedData = await fetchProductDetail(selectedFilters);
         setProductData(mappedData);
       } catch (error) {
         console.error("Failed to fetch filtered products:", error);

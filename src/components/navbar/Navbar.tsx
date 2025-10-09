@@ -11,6 +11,8 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 import SecondaryButton from "../buttons/SecondaryButton";
+import { useProductStore } from "@/zustand/store";
+import { fetchCartData } from "@/utils/FetchCartItem";
 
 const navItem = [
   {
@@ -35,10 +37,26 @@ const Navbar = () => {
   const [hideNavbar, setHideNavbar] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const userData = useProductStore((state) => state.userData);
+  const bagData = useProductStore((state) => state.bagData);
+  const setBagData = useProductStore((state) => state.setBagData);
+
+  const userId = userData?.id || ""; //typesafety for userId
 
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      if (userId) {
+        const cartData = await fetchCartData(userId);
+        setBagData(cartData);
+      }
+    };
+
+    loadCart();
+  }, [userId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,8 +128,15 @@ const Navbar = () => {
           </NavLink>
 
           {/* add to bag */}
-          <NavLink to={"/cart"}>
+          <NavLink to={"/cart"} className="relative">
             <ShoppingCart />
+
+            {/* cart item number */}
+            {bagData.length > 0 && (
+              <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                {bagData.length}
+              </span>
+            )}
           </NavLink>
         </div>
 
@@ -124,8 +149,15 @@ const Navbar = () => {
                   <User />
                 </NavLink>
 
-                <NavLink to={"/cart"}>
+                <NavLink to={"/cart"} className="relative">
                   <ShoppingCart />
+
+                  {/* cart item number */}
+                  {bagData.length > 0 && (
+                    <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                      {bagData.length}
+                    </span>
+                  )}
                 </NavLink>
               </div>
               <Menu />
@@ -179,8 +211,17 @@ const Navbar = () => {
                 <Heart /> Favourites
               </NavLink>
 
-              <NavLink to={"/cart"} className="flex gap-2 font-medium">
-                <ShoppingCart /> Bag
+              <NavLink to={"/cart"} className="flex gap-2 font-medium ">
+                <div className="relative">
+                  <ShoppingCart />
+                  {/* cart item number */}
+                  {bagData.length > 0 && (
+                    <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                      {bagData.length}
+                    </span>
+                  )}
+                </div>
+                Bag
               </NavLink>
             </div>
 

@@ -6,13 +6,16 @@ import { toast } from "sonner";
 
 const ProfileDetails = () => {
   const userData = useProductStore((state) => state.userData);
+  const clearUserData = useProductStore((state) => state.clearUserData);
+  const clearBagData = useProductStore((state) => state.clearBagData);
   const navigate = useNavigate();
 
   // handleLogout
   const handleLogout = (userType: string | undefined) => {
-    console.log("logout pressed");
     if (userType?.toUpperCase() === "USER") {
       localStorage.removeItem("isLogin");
+      clearUserData();
+      clearBagData();
     } else {
       localStorage.removeItem("isLogin");
       localStorage.removeItem("isAdmin");
