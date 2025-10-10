@@ -30,7 +30,7 @@ export const useProductStore = create<ProductState>()(
       setProductData: (data) => set({ productData: data }),
       setFeaturedProductData: (data) => set({ featuredProductData: data }),
       setUserData: (data) => set({ userData: data }),
-      setBagData: (data) => set({ bagData: data }),
+      setBagData: (data) => set({ bagData: [...data] }),
 
       clearProductData: () => set({ productData: [] }),
       clearFeaturedProductData: () => set({ featuredProductData: [] }),

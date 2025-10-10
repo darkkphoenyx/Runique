@@ -46,7 +46,7 @@ const HeroSection = () => {
         <img
           src="/assets/Homepage/Hero/Hero.png"
           alt="hero section"
-          className="object-cover md:relative absolute top-7 block md:hidden scale-90"
+          className="object-cover md:relative absolute block md:hidden scale-90"
         />
       </div>
     </div>

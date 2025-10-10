@@ -94,8 +94,10 @@ const ProductDetailWrapper = () => {
   }
 
   return (
-    <div className="pt-[100px] px-4 h-full">
-      <ProductBreadcrumb title={data.title} />
+    <div className="md:pt-[100px] pt-[80px] px-4 h-full">
+      <div className="hidden md:block">
+        <ProductBreadcrumb title={data.title} />
+      </div>
       <div className="grid lg:grid-cols-2 justify-center max-w-[1000px] mx-auto">
         {/* Left Section - Image Gallery */}
         <div className="w-full hidden border-none h-fit sticky top-10 lg:flex max-md:justify-center shadow-none p-0 rounded-lg">
@@ -124,14 +126,16 @@ const ProductDetailWrapper = () => {
         {/* Right Section - Product Info */}
         <Card className="border-none shadow-none p-0 gap-0 lg:w-[90%] w-[100%] mx-auto">
           <div>
-            <CardHeader className="text-red-600 font-medium p-0 text-sm">
+            <CardHeader className="text-red-600 font-medium p-0 md:text-sm text-xs">
               {data.header}
             </CardHeader>
-            <CardTitle className="md:text-xl text-lg -mt-2">
+            <CardTitle className="md:text-xl text-2xl -mt-2">
               {data.title}
             </CardTitle>
             <CardDescription className="text-sm">{data.type}</CardDescription>
-            <p className="mt-2 text-lg font-medium">MRP: {data.price}</p>
+            <p className="mt-2 md:text-lg text-xl font-medium text-red-600">
+              Rs. {data.price}
+            </p>
             <p className="mt-2 text-xs text-gray-500">
               Inclusive of all taxes <br />
               (Also includes all applicable duties)

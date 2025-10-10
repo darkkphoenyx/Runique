@@ -93,7 +93,7 @@ const RelatedProducts = ({
                               {card.title}
                             </p>
                             <CardDescription>{card.type}</CardDescription>
-                            <p className="font-semibold">MRP: {card.price}</p>
+                            <p className="font-semibold">Rs: {card.price}</p>
                           </div>
                         </CardContent>
                       </Card>

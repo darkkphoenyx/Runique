@@ -344,6 +344,20 @@ export class Products {
     }
   };
 
+  //delete order item
+  deleteOrderItems = async (id: string) => {
+    try {
+      this.database.deleteDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId4,
+        id
+      );
+    } catch (error: any) {
+      console.error("Failed to delete items", error);
+      throw new Error(error.message);
+    }
+  };
+
   // fetch bag item
   fetchBag = async (userId: string) => {
     try {

@@ -1,32 +1,75 @@
 import products from "@/appwrite/APIs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { fetchCartData } from "@/utils/FetchCartItem";
+import { fetchProductDetail } from "@/utils/FetchProductDetails";
 import { useProductStore } from "@/zustand/store";
 import { Heart, Minus, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const BagProductCard = ({
-  productId,
-  size,
-  quantity,
-  userId,
-  price,
-}: {
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+
+type BagProductCardProps = {
+  id: string;
   productId: string;
   size: number;
   quantity: number;
   userId: string;
   price: number;
-}) => {
+  isSelected: boolean;
+  onSelect: () => void;
+  onDelete: () => void; // ✅ NEW
+};
+
+const BagProductCard = ({
+  id,
+  productId,
+  size,
+  quantity,
+  userId,
+  price,
+  isSelected,
+  onSelect,
+  onDelete,
+}: BagProductCardProps) => {
   const productData = useProductStore((state) => state.productData);
   const setBagData = useProductStore((state) => state.setBagData);
   const CardData = productData.find((item) => item.id === productId);
+  const setProductData = useProductStore((state) => state.setProductData);
 
-  // Handle increasing quantity
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
+
+  useEffect(() => {
+    const loadProductStore = async () => {
+      try {
+        const res = await fetchProductDetail(selectedFilters);
+        setProductData(res);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (productData.length === 0) {
+      loadProductStore();
+      setSelectedFilters({});
+    }
+  }, []);
+
   const handleIncrease = async () => {
     if (quantity < 15) {
       try {
         await products.increaseQuantity(userId, productId, size, price);
-        // update the bag data after increasing the quantity
         const updatedBagData = await fetchCartData(userId);
         setBagData(updatedBagData);
       } catch (error) {
@@ -40,12 +83,10 @@ const BagProductCard = ({
     }
   };
 
-  // Handle decreasing quantity
   const handleDecrease = async () => {
     if (quantity > 1) {
       try {
         await products.decreaseQuantity(userId, productId, size, price);
-        // update the bag data after decreasing the quantity
         const updatedBagData = await fetchCartData(userId);
         setBagData(updatedBagData);
       } catch (error) {
@@ -55,8 +96,15 @@ const BagProductCard = ({
   };
 
   return (
-    <div>
-      <div key={CardData?.id} className="flex md:gap-4 gap-2 border lg:p-2 p-1">
+    <div className="border flex gap-2 items-center px-2">
+      <Checkbox
+        id={id}
+        checked={isSelected}
+        onCheckedChange={onSelect}
+        className="border-black/50 data-[state=checked]:bg-black h-5 w-5 cursor-pointer"
+      />
+
+      <div className="flex md:gap-4 gap-2 w-full lg:p-2 p-1">
         <div className="w-fit overflow-hidden">
           <img
             className="md:h-[150px] md:w-[150px] h-[100px] w-[100px] object-cover"
@@ -64,10 +112,15 @@ const BagProductCard = ({
             alt="Product image"
           />
         </div>
-        <div className="flex-1 flex gap-2 justify-between flex-wrap ">
+
+        <div className="flex-1 flex gap-2 justify-between flex-wrap">
           <div>
-            <h2 className="font-medium lg:text-lg">{CardData?.title}</h2>
-            <p className="lg:text-sm text-xs font-medium">Size: {size}</p>
+            <h2 className="font-medium lg:text-lg max-md:text-sm">
+              {CardData?.title}
+            </h2>
+            <p className="lg:text-sm text-xs font-medium lg:mt-4 mt-2">
+              Size: {size}
+            </p>
             <div className="lg:text-sm text-xs font-medium flex gap-2">
               Quantity:
               <div className="flex items-center">
@@ -106,21 +159,52 @@ const BagProductCard = ({
               </div>
             </div>
           </div>
+
           <div className="flex lg:w-fit w-full max-md:items-center lg:flex-col max-lg:justify-between max-lg:mt-auto">
             <p className="font-medium lg:text-lg text-red-600 text-sm">
-              MRP. {CardData?.price}
+              Rs. {CardData?.price}
             </p>
+
             <div className="flex gap-3 lg:mt-4 text-gray-500">
               <Heart
                 className="hover:text-red-600 cursor-pointer block lg:hidden"
                 size={18}
               />
               <Heart className="hover:text-red-600 cursor-pointer hidden lg:block" />
-              <Trash2
-                className="hover:text-red-600 cursor-pointer block lg:hidden"
-                size={18}
-              />
-              <Trash2 className="hover:text-red-600 cursor-pointer hidden lg:block" />
+
+              {/* AlertDialog Wrapper */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Trash2
+                    className="hover:text-red-600 cursor-pointer block lg:hidden"
+                    size={18}
+                  />
+                </AlertDialogTrigger>
+                <AlertDialogTrigger asChild>
+                  <Trash2 className="hover:text-red-600 cursor-pointer hidden lg:block" />
+                </AlertDialogTrigger>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action will permanently delete this item from your
+                      bag.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-red-600"
+                      onClick={onDelete}
+                    >
+                      Yes, delete it
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>

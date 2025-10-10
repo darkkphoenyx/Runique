@@ -36,7 +36,7 @@ const CollectionCard = ({ data }: { data: IProductCard }) => {
           {data.colorAvailable.length} Colour
         </CardDescription>
       </div>
-      <p className="font-semibold mt-auto">MRP : {data.price}</p>
+      <p className="font-semibold mt-auto text-red-600">Rs. {data.price}</p>
     </Card>
   );
 };
