@@ -18,6 +18,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 type BagProductCardProps = {
   id: string;
@@ -27,8 +28,10 @@ type BagProductCardProps = {
   userId: string;
   price: number;
   isSelected: boolean;
+  isFavourite?: boolean;
   onSelect: () => void;
-  onDelete: () => void; // ✅ NEW
+  onDelete: () => void;
+  toggleFavourite: () => void;
 };
 
 const BagProductCard = ({
@@ -39,8 +42,10 @@ const BagProductCard = ({
   userId,
   price,
   isSelected,
+  isFavourite,
   onSelect,
   onDelete,
+  toggleFavourite,
 }: BagProductCardProps) => {
   const productData = useProductStore((state) => state.productData);
   const setBagData = useProductStore((state) => state.setBagData);
@@ -161,18 +166,59 @@ const BagProductCard = ({
           </div>
 
           <div className="flex lg:w-fit w-full max-md:items-center lg:flex-col max-lg:justify-between max-lg:mt-auto">
-            <p className="font-medium lg:text-lg text-red-600 text-sm">
+            <p className="font-medium lg:text-lg text-sm">
               Rs. {CardData?.price}
             </p>
 
             <div className="flex gap-3 lg:mt-4 text-gray-500">
-              <Heart
-                className="hover:text-red-600 cursor-pointer block lg:hidden"
-                size={18}
-              />
-              <Heart className="hover:text-red-600 cursor-pointer hidden lg:block" />
+              {/* Toggle Favourite */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Heart
+                    fill={isFavourite ? "red" : "transparent"}
+                    className={cn(
+                      `${
+                        isFavourite && "text-red-500"
+                      } hover:text-red-500 cursor-pointer block lg:hidden`
+                    )}
+                    size={18}
+                  />
+                </AlertDialogTrigger>
+                <AlertDialogTrigger asChild>
+                  <Heart
+                    fill={isFavourite ? "red" : "transparent"}
+                    className={cn(
+                      `${
+                        isFavourite && "text-red-500"
+                      } hover:text-red-500 cursor-pointer hidden lg:block`
+                    )}
+                  />
+                </AlertDialogTrigger>
 
-              {/* AlertDialog Wrapper */}
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Toggle Favourite</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {isFavourite
+                        ? "Remove this item from Favourite"
+                        : "Add this item to Favourite"}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="hover:bg-black hover:text-white">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-red-600 hover:bg-black"
+                      onClick={toggleFavourite}
+                    >
+                      {isFavourite ? "Remove from Favourite" : "Add to Favourite"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              {/* Delete item - AlertDialog Wrapper */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Trash2
@@ -195,9 +241,11 @@ const BagProductCard = ({
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel className="hover:bg-black hover:text-white">
+                      Cancel
+                    </AlertDialogCancel>
                     <AlertDialogAction
-                      className="bg-red-600"
+                      className="bg-red-600 hover:bg-black"
                       onClick={onDelete}
                     >
                       Yes, delete it

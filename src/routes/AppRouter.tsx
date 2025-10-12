@@ -5,6 +5,7 @@ import ProtectedRoutes from "@/layouts/ProtectedRoutes";
 import ScrollWrapper from "@/layouts/ScrollWrapper";
 import Bag from "@/pages/Bag/Bag";
 import CollectionWrapper from "@/pages/Collection/CollectionsWrapper";
+import Favourite from "@/pages/Favourite/Favourite";
 
 import Homepage from "@/pages/Homepage";
 import { Login } from "@/pages/login/Login";
@@ -32,6 +33,7 @@ const AppRouter = () => {
             <Route element={<ProtectedRoutes />}>
               <Route path="/profile" element={<ProfileDetails />} />
               <Route path="/cart" element={<Bag />} />
+              <Route path="/favourite" element={<Favourite />} />
             </Route>
           </Route>
           <Route path="/login" element={<Login />} />

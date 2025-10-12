@@ -129,11 +129,11 @@ const ProductDetailWrapper = () => {
             <CardHeader className="text-red-600 font-medium p-0 md:text-sm text-xs">
               {data.header}
             </CardHeader>
-            <CardTitle className="md:text-xl text-2xl -mt-2">
+            <CardTitle className="text-xl -mt-2">
               {data.title}
             </CardTitle>
             <CardDescription className="text-sm">{data.type}</CardDescription>
-            <p className="mt-2 md:text-lg text-xl font-medium text-red-600">
+            <p className="mt-2 text-lg  font-medium text-red-600">
               Rs. {data.price}
             </p>
             <p className="mt-2 text-xs text-gray-500">

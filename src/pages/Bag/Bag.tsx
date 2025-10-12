@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useProductStore } from "@/zustand/store";
-import { CircleQuestionMark } from "lucide-react";
+import { CircleQuestionMark, Trash2 } from "lucide-react";
 import BagProductCard from "./BagProductCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import Footer from "@/components/footer/Footer";
@@ -66,7 +66,7 @@ const Bag = () => {
         const updated = await fetchCartData(userId);
         setBagData(updated);
         toast.success("Item deleted");
-      }, 300); //this is done prevent the server down time - delay
+      }, 500); //this is done prevent the server down time - delay
     } catch (error) {
       toast.error("Failed to delete item");
       console.error(error);
@@ -82,12 +82,31 @@ const Bag = () => {
           return item ? products.deleteOrderItems(item.id) : null;
         })
       );
-      const updated = await fetchCartData(bagData[0]?.users || "");
-      setBagData(updated);
-      setSelectedItems([]);
-      toast.success("Selected items deleted");
+      setTimeout(async () => {
+        const updated = await fetchCartData(bagData[0]?.users || "");
+        setBagData(updated);
+        setSelectedItems([]);
+        toast.success("Selected items deleted");
+      }, 500);
     } catch (error) {
       toast.error("Failed to delete selected items");
+      console.error(error);
+    }
+  };
+
+  //toggle favourite
+  const toggleFavourite = async (productId: string, isFavourite: boolean) => {
+    try {
+      await products.toggleFavourite(productId, isFavourite);
+      setTimeout(async () => {
+        const updated = await fetchCartData(bagData[0].users || "");
+        setBagData(updated);
+        toast.success(
+          `${isFavourite ? "Removed from Favourite" : "Added to Favourite"}`
+        );
+      }, 500);
+    } catch (error) {
+      toast.error("Failed to Toggle Favourite");
       console.error(error);
     }
   };
@@ -97,66 +116,80 @@ const Bag = () => {
     .reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
-    <div className="h-full flex flex-col lg:pt-28 pt-20 px-4">
-      <div className="lg:grid lg:grid-cols-3 lg:max-w-[1200px] h-full w-full mx-auto lg:gap-8">
+    <div className="h-screen flex flex-col lg:pt-28 pt-20">
+      <div className="lg:grid lg:grid-cols-3 lg:max-w-[1200px] h-full w-full mx-auto lg:gap-8 px-4">
         {/* LEFT SIDE - BAG ITEMS */}
-        <div className="flex gap-4 flex-col col-span-2 max-lg:overflow-y-scroll max-lg:max-h-[370px]">
-          <div className="max-lg:sticky top-0 bg-white flex border p-2 gap-2 items-center text-black/50 uppercase text-sm">
-            <Checkbox
-              checked={isAllSelected}
-              onCheckedChange={toggleSelectAll}
-              className="border-black/50 data-[state=checked]:bg-black h-5 w-5 cursor-pointer"
-            />
-            Select all ({bagData.length} item{bagData.length !== 1 ? "s" : ""})
-            {selectedItems.length > 0 && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <button className="ml-auto text-red-600 text-xs underline">
-                    Delete Selected
-                  </button>
-                </AlertDialogTrigger>
 
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action will permanently delete this item from your
-                      bag.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-red-600"
-                      onClick={deleteSelectedItems}
-                    >
-                      Yes, delete it
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-          </div>
-
-          <div className="gap-2 flex flex-col">
-            {bagData.map((item) => (
-              <BagProductCard
-                id={item.id}
-                key={item.id}
-                price={item.price}
-                userId={item.users}
-                quantity={Number(item.quantity)}
-                size={Number(item.size)}
-                productId={item.products}
-                isSelected={selectedItems.includes(item.id)}
-                onSelect={() => toggleSelect(item.id)}
-                onDelete={() => handleDeleteItem(item.id, item.users)}
+        {bagData.length > 0 ? (
+          <div className="flex gap-4 flex-col col-span-2 max-lg:overflow-y-scroll max-lg:max-h-[370px]">
+            <div className="max-lg:sticky top-0 bg-white flex border p-2 gap-2 items-center text-black/50 uppercase text-sm ">
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={toggleSelectAll}
+                className="border-black/50 data-[state=checked]:bg-black h-5 w-5 cursor-pointer"
               />
-            ))}
+              Select all ({bagData.length} item{bagData.length !== 1 ? "s" : ""}
+              )
+              {selectedItems.length > 0 && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="ml-auto text-red-600 md:text-sm text-xs underline">
+                      <Trash2 size={20} />
+                    </button>
+                  </AlertDialogTrigger>
+
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action will permanently delete this item from your
+                        bag.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-600"
+                        onClick={deleteSelectedItems}
+                      >
+                        Yes, delete it
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
+
+            <div className="gap-2 flex flex-col">
+              {bagData.map((item) => (
+                <BagProductCard
+                  id={item.id}
+                  key={item.id}
+                  price={item.price}
+                  userId={item.users}
+                  quantity={Number(item.quantity)}
+                  size={Number(item.size)}
+                  productId={item.products}
+                  isSelected={selectedItems.includes(item.id)}
+                  isFavourite={item.isFavourite}
+                  onSelect={() => toggleSelect(item.id)}
+                  onDelete={() => handleDeleteItem(item.id, item.users)}
+                  toggleFavourite={() =>
+                    toggleFavourite(item.id, item.isFavourite)
+                  }
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          // fallback if no items
+          <div className="col-span-2 h-[450px] flex flex-col max-lg:items-center">
+            <h2 className="text-2xl font-medium">Bag</h2>
+            <p className="ml-2">There are no items in your bag.</p>
+          </div>
+        )}
 
         {/* RIGHT SIDE - SUMMARY */}
         <div className="col-span-1 lg:mt-0 h-fit w-full hidden lg:block lg:sticky top-28 bg-white px-2">
@@ -213,8 +246,8 @@ const Bag = () => {
         </div>
       </div>
 
-      {/* FOOTER MOBILE */}
-      <div className="w-full lg:hidden fixed bottom-0 bg-white pr-8 py-4">
+      {/* SUMMARY MOBILE */}
+      <div className="w-full lg:hidden fixed bottom-0 bg-white px-2 py-4">
         <Separator />
         <h3 className="font-medium text-xl pt-4">Summary</h3>
         <Tooltip>
@@ -267,7 +300,7 @@ const Bag = () => {
         </div>
       </div>
 
-      <div className="hidden lg:block mt-20">
+      <div className="hidden lg:block mt-auto">
         <Footer />
       </div>
     </div>

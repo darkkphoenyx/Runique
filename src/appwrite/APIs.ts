@@ -289,6 +289,7 @@ export class Products {
             products: productId,
             quantity: duplicateOrder.documents[0].quantity + quantity,
             size: size,
+            isFavourite: false,
           }
         );
 
@@ -304,6 +305,7 @@ export class Products {
             products: productId,
             quantity: quantity,
             size: size,
+            isFavourite: false,
           }
         );
         return res;
@@ -369,6 +371,24 @@ export class Products {
       return res.documents;
     } catch (error: any) {
       console.error("Order placing failed:", error);
+      throw new Error(error.message);
+    }
+  };
+
+  // toggle favourite
+  toggleFavourite = async (id: string, isFavourite: boolean) => {
+    try {
+      const res = await this.database.updateDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId4,
+        id,
+        {
+          isFavourite: !isFavourite,
+        }
+      );
+      return res;
+    } catch (error: any) {
+      console.error("Add to Favourite failed: ", error);
       throw new Error(error.message);
     }
   };

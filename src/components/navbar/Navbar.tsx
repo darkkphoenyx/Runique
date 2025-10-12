@@ -76,6 +76,8 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  const favouriteItemCount = bagData.filter((data) => data.isFavourite);
+
   const isProduct = location.pathname.includes("p/");
   return (
     <div
@@ -123,8 +125,13 @@ const Navbar = () => {
           </NavLink>
 
           {/* favourites */}
-          <NavLink to={"/favourite"}>
+          <NavLink to={"/favourite"} className="relative">
             <Heart />
+            {bagData.length > 0 && (
+              <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                {favouriteItemCount.length}
+              </span>
+            )}
           </NavLink>
 
           {/* add to bag */}
@@ -208,7 +215,15 @@ const Navbar = () => {
 
             <div className="gap-4 flex flex-col pb-4">
               <NavLink to={"/favourite"} className="flex gap-2 font-medium">
-                <Heart /> Favourites
+                <p className="relative">
+                  <Heart />
+                  {bagData.length > 0 && (
+                    <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                      {favouriteItemCount.length}
+                    </span>
+                  )}
+                </p>
+                Favourites
               </NavLink>
 
               <NavLink to={"/cart"} className="flex gap-2 font-medium ">

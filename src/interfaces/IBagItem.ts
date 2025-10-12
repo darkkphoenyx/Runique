@@ -6,4 +6,5 @@ export interface IBagItem {
   quantity: number;
   products: string;
   size: string;
+  isFavourite: boolean;
 }
