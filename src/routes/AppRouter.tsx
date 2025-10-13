@@ -3,6 +3,7 @@ import FooterEffectWrapper from "@/layouts/FooterEffectWrapper";
 import OpenRoutes from "@/layouts/OpenRoutes";
 import ProtectedRoutes from "@/layouts/ProtectedRoutes";
 import ScrollWrapper from "@/layouts/ScrollWrapper";
+import About from "@/pages/About/About";
 import Bag from "@/pages/Bag/Bag";
 import CollectionWrapper from "@/pages/Collection/CollectionsWrapper";
 import Favourite from "@/pages/Favourite/Favourite";
@@ -23,8 +24,9 @@ const AppRouter = () => {
             <Route element={<FooterEffectWrapper />}>
               <Route path="/" element={<Homepage />} />
             </Route>
-            {/* scroll to top wrapper */}
             <Route element={<ScrollWrapper />}>
+              {/* scroll to top wrapper */}
+              <Route path="/about" element={<About />} />
               <Route path="/shop" element={<CollectionWrapper />} />
               <Route path="/p/:slug" element={<ProductDetailWrapper />} />
             </Route>

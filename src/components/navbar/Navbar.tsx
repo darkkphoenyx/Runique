@@ -1,7 +1,7 @@
 import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Sheet,
   SheetClose,
@@ -13,6 +13,7 @@ import {
 import SecondaryButton from "../buttons/SecondaryButton";
 import { useProductStore } from "@/zustand/store";
 import { fetchCartData } from "@/utils/FetchCartItem";
+import { toast } from "sonner";
 
 const navItem = [
   {
@@ -25,11 +26,6 @@ const navItem = [
     link: "/shop",
     name: "Shop",
   },
-  {
-    id: 3,
-    link: "/contact",
-    name: "Contact",
-  },
 ];
 
 const Navbar = () => {
@@ -40,8 +36,10 @@ const Navbar = () => {
   const userData = useProductStore((state) => state.userData);
   const bagData = useProductStore((state) => state.bagData);
   const setBagData = useProductStore((state) => state.setBagData);
-
+  const clearUserData = useProductStore((state) => state.clearUserData);
+  const clearBagData = useProductStore((state) => state.clearBagData);
   const userId = userData?.id || ""; //typesafety for userId
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsOpen(false);
@@ -75,6 +73,19 @@ const Navbar = () => {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+
+  const handleLogout = (userType: string | undefined) => {
+    if (userType?.toUpperCase() === "USER") {
+      localStorage.removeItem("isLogin");
+      clearUserData();
+      clearBagData();
+    } else {
+      localStorage.removeItem("isLogin");
+      localStorage.removeItem("isAdmin");
+    }
+    toast.success("Logged out.");
+    navigate("/");
+  };
 
   const favouriteItemCount = bagData.filter((data) => data.isFavourite);
 
@@ -204,12 +215,21 @@ const Navbar = () => {
               </p>
 
               <div>
-                <Link to={"/login"}>
-                  <SecondaryButton
-                    title="Sign in"
-                    className="bg-white text-black border-gray-400 rounded-full border hover:text-white"
-                  />
-                </Link>
+                {userId ? (
+                  <div onClick={() => handleLogout(userData?.role)}>
+                    <SecondaryButton
+                      title={"Logout"}
+                      className="bg-white text-black border-gray-400 rounded-full border hover:text-white"
+                    />
+                  </div>
+                ) : (
+                  <Link to={"/login"}>
+                    <SecondaryButton
+                      title={"Sign in"}
+                      className="bg-white text-black border-gray-400 rounded-full border hover:text-white"
+                    />
+                  </Link>
+                )}
               </div>
             </div>
 
