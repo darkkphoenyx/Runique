@@ -9,7 +9,6 @@ import { useProductStore } from "@/zustand/store";
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import products from "@/appwrite/APIs";
-import PrimaryButton from "@/components/buttons/PrimaryButton";
 import ProductDetailsSkeleton from "@/components/skeletons/ProductDetailsSkeleton";
 import ShoesSizeGrid from "./ShoesSizeGrid";
 import PhotoCarousel from "./PhotoCarousel";
@@ -129,9 +128,7 @@ const ProductDetailWrapper = () => {
             <CardHeader className="text-red-600 font-medium p-0 md:text-sm text-xs">
               {data.header}
             </CardHeader>
-            <CardTitle className="text-xl -mt-2">
-              {data.title}
-            </CardTitle>
+            <CardTitle className="text-xl -mt-2">{data.title}</CardTitle>
             <CardDescription className="text-sm">{data.type}</CardDescription>
             <p className="mt-2 text-lg  font-medium text-red-600">
               Rs. {data.price}
@@ -153,19 +150,6 @@ const ProductDetailWrapper = () => {
             productId={data.id}
             sizeData={data.sizes}
           />
-
-          <div className="mt-[40px] w-full flex flex-col gap-y-2">
-            <PrimaryButton
-              title="Add to Bag"
-              link=""
-              className="bg-black text-white text-sm w-full py-6"
-            />
-            <PrimaryButton
-              link=""
-              title="Favourite"
-              className="bg-white text-black text-sm border border-black w-full py-6"
-            />
-          </div>
 
           {/* description and color options */}
           <div className="mt-8">

@@ -14,6 +14,7 @@ import SecondaryButton from "../buttons/SecondaryButton";
 import { useProductStore } from "@/zustand/store";
 import { fetchCartData } from "@/utils/FetchCartItem";
 import { toast } from "sonner";
+import products from "@/appwrite/APIs";
 
 const navItem = [
   {
@@ -35,7 +36,9 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const userData = useProductStore((state) => state.userData);
   const bagData = useProductStore((state) => state.bagData);
+  const favourite = useProductStore((state) => state.favouriteData);
   const setBagData = useProductStore((state) => state.setBagData);
+  const setFavouriteData = useProductStore((state) => state.setFavouriteData);
   const clearUserData = useProductStore((state) => state.clearUserData);
   const clearBagData = useProductStore((state) => state.clearBagData);
   const userId = userData?.id || ""; //typesafety for userId
@@ -49,6 +52,8 @@ const Navbar = () => {
     const loadCart = async () => {
       if (userId) {
         const cartData = await fetchCartData(userId);
+        const favouriteData: any = await products.getFavourites();
+        setFavouriteData(favouriteData.documents);
         setBagData(cartData);
       }
     };
@@ -87,7 +92,7 @@ const Navbar = () => {
     navigate("/");
   };
 
-  const favouriteItemCount = bagData.filter((data) => data.isFavourite);
+  // const favouriteItemCount = bagData.filter((data) => data.isFavourite);
 
   const isProduct = location.pathname.includes("p/");
   return (
@@ -140,7 +145,7 @@ const Navbar = () => {
             <Heart />
             {bagData.length > 0 && (
               <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
-                {favouriteItemCount.length}
+                {favourite.length}
               </span>
             )}
           </NavLink>
@@ -239,7 +244,7 @@ const Navbar = () => {
                   <Heart />
                   {bagData.length > 0 && (
                     <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
-                      {favouriteItemCount.length}
+                      {favourite.length}
                     </span>
                   )}
                 </p>

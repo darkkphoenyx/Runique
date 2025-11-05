@@ -15,6 +15,7 @@ import SecondaryButton from "@/components/buttons/SecondaryButton";
 import products from "@/appwrite/APIs";
 import { fetchCartData } from "@/utils/FetchCartItem";
 import { toast } from "sonner";
+import { useEffectOnce } from "react-use";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +31,8 @@ import {
 const Bag = () => {
   const bagData = useProductStore((state) => state.bagData);
   const setBagData = useProductStore((state) => state.setBagData);
+  const setFavouriteData = useProductStore((state) => state.setFavouriteData);
+  // const favouriteData = useProductStore((state) => state.favouriteData);
 
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(0);
@@ -40,6 +43,19 @@ const Bag = () => {
       .reduce((acc, item) => acc + item.quantity, 0);
     setSelectedQuantity(totalQuantity);
   }, [selectedItems, bagData]);
+
+  //fetch favourites
+  useEffectOnce(() => {
+    (async () => {
+      try {
+        const res = await products.getFavourites();
+        const data: any = res.documents || [];
+        setFavouriteData(data);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  });
 
   const toggleSelect = (id: string) => {
     setSelectedItems((prev) =>
@@ -94,23 +110,29 @@ const Bag = () => {
     }
   };
 
-  //toggle favourite
-  const toggleFavourite = async (productId: string, isFavourite: boolean) => {
+  //add to favourite
+  const addToFavourite = async (userId: string, productId: string) => {
     try {
-      await products.toggleFavourite(productId, isFavourite);
-      setTimeout(async () => {
-        const updated = await fetchCartData(bagData[0].users || "");
-        setBagData(updated);
-        toast.success(
-          `${isFavourite ? "Removed from Favourite" : "Added to Favourite"}`
-        );
-      }, 500);
+      const res = await products.addToFavourite(userId, productId);
+      const favouriteData: any = await products.getFavourites();
+      setFavouriteData(favouriteData.documents);
+      if (res === 201) toast.success("Added to Favourite");
     } catch (error) {
-      toast.error("Failed to Toggle Favourite");
-      console.error(error);
+      toast.error("Failed to add Favourite");
     }
   };
 
+  //remove favourite
+  const removeFavourite = async (userId: string, productId: string) => {
+    try {
+      await products.deleteFavourite(userId, productId);
+      const favouriteData: any = await products.getFavourites();
+      setFavouriteData(favouriteData.documents);
+      toast.success("Favourite removed");
+    } catch (error) {
+      toast.error("Failed to remove favourite");
+    }
+  };
   const subtotal = bagData
     .filter((item) => selectedItems.includes(item.id))
     .reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -173,11 +195,13 @@ const Bag = () => {
                   size={Number(item.size)}
                   productId={item.products}
                   isSelected={selectedItems.includes(item.id)}
-                  isFavourite={item.isFavourite}
                   onSelect={() => toggleSelect(item.id)}
                   onDelete={() => handleDeleteItem(item.id, item.users)}
-                  toggleFavourite={() =>
-                    toggleFavourite(item.id, item.isFavourite)
+                  removeFavourite={() =>
+                    removeFavourite(item.users, item.products)
+                  }
+                  addToFavourite={() =>
+                    addToFavourite(item.users, item.products)
                   }
                 />
               ))}

@@ -28,10 +28,10 @@ type BagProductCardProps = {
   userId: string;
   price: number;
   isSelected: boolean;
-  isFavourite?: boolean;
   onSelect: () => void;
   onDelete: () => void;
-  toggleFavourite: () => void;
+  removeFavourite: () => void;
+  addToFavourite: () => void;
 };
 
 const BagProductCard = ({
@@ -42,19 +42,22 @@ const BagProductCard = ({
   userId,
   price,
   isSelected,
-  isFavourite,
   onSelect,
   onDelete,
-  toggleFavourite,
+  removeFavourite,
+  addToFavourite,
 }: BagProductCardProps) => {
   const productData = useProductStore((state) => state.productData);
   const setBagData = useProductStore((state) => state.setBagData);
   const CardData = productData.find((item) => item.id === productId);
   const setProductData = useProductStore((state) => state.setProductData);
+  const favouriteData = useProductStore((state) => state.favouriteData);
 
   const [selectedFilters, setSelectedFilters] = useState<
     Record<string, string[]>
   >({});
+
+  const favourite = favouriteData.find((data) => data.productId === productId);
 
   useEffect(() => {
     const loadProductStore = async () => {
@@ -70,7 +73,6 @@ const BagProductCard = ({
       setSelectedFilters({});
     }
   }, []);
-
   const handleIncrease = async () => {
     if (quantity < 15) {
       try {
@@ -175,10 +177,10 @@ const BagProductCard = ({
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Heart
-                    fill={isFavourite ? "red" : "transparent"}
+                    fill={favourite ? "red" : "transparent"}
                     className={cn(
                       `${
-                        isFavourite && "text-red-500"
+                        favourite && "text-red-500"
                       } hover:text-red-500 cursor-pointer block lg:hidden`
                     )}
                     size={18}
@@ -186,10 +188,10 @@ const BagProductCard = ({
                 </AlertDialogTrigger>
                 <AlertDialogTrigger asChild>
                   <Heart
-                    fill={isFavourite ? "red" : "transparent"}
+                    fill={favourite ? "red" : "transparent"}
                     className={cn(
                       `${
-                        isFavourite && "text-red-500"
+                        favourite && "text-red-500"
                       } hover:text-red-500 cursor-pointer hidden lg:block`
                     )}
                   />
@@ -199,7 +201,7 @@ const BagProductCard = ({
                   <AlertDialogHeader>
                     <AlertDialogTitle>Toggle Favourite</AlertDialogTitle>
                     <AlertDialogDescription>
-                      {isFavourite
+                      {favourite
                         ? "Remove this item from Favourite"
                         : "Add this item to Favourite"}
                     </AlertDialogDescription>
@@ -210,9 +212,9 @@ const BagProductCard = ({
                     </AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-red-600 hover:bg-black"
-                      onClick={toggleFavourite}
+                      onClick={favourite ? removeFavourite : addToFavourite}
                     >
-                      {isFavourite ? "Remove from Favourite" : "Add to Favourite"}
+                      {favourite ? "Remove from Favourite" : "Add to Favourite"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

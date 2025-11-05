@@ -210,7 +210,7 @@ export class Products {
     try {
       const res = await this.database.getDocument(
         config.appwriteDatabaseId,
-        config.appwriteCollectionId4,
+        config.appwriteCollectionId1,
         id
       );
       return res;
@@ -375,6 +375,104 @@ export class Products {
     }
   };
 
+  //add to favourite
+  addToFavourite = async (
+    userId: string,
+    productId: string
+  ): Promise<number> => {
+    try {
+      const existingFavourites = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5,
+        [Query.equal("userId", userId), Query.equal("productId", productId)]
+      );
+
+      if (existingFavourites.total > 0) {
+        console.warn(
+          `Favourite already exists for user: ${userId}, product: ${productId}`
+        );
+        return 409;
+      }
+
+      const product = await this.database.getDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId1,
+        productId
+      );
+
+      if (!product) {
+        console.warn(`Product not found: ${productId}`);
+        return 404;
+      }
+
+      const favouritePayload = {
+        userId,
+        productId,
+        productName: product.title ?? "Unknown Product",
+        productImage: Array.isArray(product.imgUrl) ? product.imgUrl[0] : null,
+        type: product.header ?? "Unknown Type",
+        colors: Array.isArray(product.colorAvailable)
+          ? product.colorAvailable.length
+          : 0,
+        price: product.price ?? 0,
+        slug: product.slug ?? "",
+      };
+
+      await this.database.createDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5,
+        ID.unique(),
+        favouritePayload
+      );
+
+      return 201;
+    } catch (error: any) {
+      console.error("Failed to add favourite:", error.message || error);
+      throw new Error(
+        `Failed to add favourite: ${error.message || "Unknown error"}`
+      );
+    }
+  };
+
+  //delete from favourite
+  deleteFavourite = async (userId: string, productId: string) => {
+    try {
+      //fetch the id using the userid and productid
+      const deleteId = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5,
+        [
+          Query.equal("userId", userId),
+          Query.equal("productId", productId),
+          Query.select(["$id"]),
+        ]
+      );
+
+      await this.database.deleteDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5,
+        deleteId.documents[0].$id
+      );
+    } catch (error: any) {
+      console.error("Failed to delete: ", error);
+      throw new Error(error.message);
+    }
+  };
+
+  //get favourites
+  getFavourites = async () => {
+    try {
+      const res = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5
+      );
+      return res;
+    } catch (error: any) {
+      console.error("Failed to get Favourties", error);
+      throw new Error(error.message);
+    }
+  };
+
   // toggle favourite
   toggleFavourite = async (id: string, isFavourite: boolean) => {
     try {
@@ -388,7 +486,7 @@ export class Products {
       );
       return res;
     } catch (error: any) {
-      console.error("Add to Favourite failed: ", error);
+      console.error("Toggle Favourite failed: ", error);
       throw new Error(error.message);
     }
   };

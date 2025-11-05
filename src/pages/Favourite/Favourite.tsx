@@ -3,15 +3,14 @@ import { useProductStore } from "@/zustand/store";
 import FavouriteProductCard from "./FavouriteProductCard";
 
 const Favourite = () => {
-  const bagData = useProductStore((state) => state.bagData);
-  const favouriteItem = bagData.filter((data) => data.isFavourite);
+  const favouriteData = useProductStore((state) => state.favouriteData);
 
   return (
     <div className="flex flex-col h-screen lg:pt-28 pt-20">
-      {favouriteItem.length > 0 ? (
+      {favouriteData.length > 0 ? (
         <div className="grid lg:grid-cols-3 grid-cols-2 mx-auto md:gap-4 mb-16">
-          {favouriteItem.map((item) => (
-            <FavouriteProductCard key={item.id} productId={item.products} />
+          {favouriteData.map((item, idx) => (
+            <FavouriteProductCard key={idx} data={item} />
           ))}
         </div>
       ) : (
