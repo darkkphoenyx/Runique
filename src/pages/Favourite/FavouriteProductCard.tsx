@@ -51,10 +51,10 @@ const FavouriteProductCard = ({ data }: FavouriteProductCardProps) => {
               alt="card image"
             />
             <AlertDialog>
-              <AlertDialogTrigger>
+              <AlertDialogTrigger className="absolute right-2 top-2 border overflow-hidden bg-white rounded-full">
                 <Heart
                   fill="red"
-                  className="text-red-500 bg-white h-10 w-10 p-2 rounded-full hover:scale-[105%] cursor-pointer transition-all absolute right-2 top-2"
+                  className="text-red-500 h-10 w-10 p-2 rounded-full hover:scale-[115%] cursor-pointer transition-all "
                 />
               </AlertDialogTrigger>
 

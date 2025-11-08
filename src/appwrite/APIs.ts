@@ -1,6 +1,7 @@
 import { Client, Databases, ID, Query, Storage } from "appwrite";
 import config from "../config/config";
 import bcrypt from "bcryptjs";
+import { Coffee } from "lucide-react";
 
 export class Products {
   client = new Client();
@@ -487,6 +488,43 @@ export class Products {
       return res;
     } catch (error: any) {
       console.error("Toggle Favourite failed: ", error);
+      throw new Error(error.message);
+    }
+  };
+
+  //upload photo
+  uploadPhoto = async (file: File) => {
+    try {
+      const res = await this.storage.createFile(
+        config.appwriteStorageId,
+        ID.unique(),
+        file
+      );
+
+      //retrieve the URL
+      const urlRes = await this.storage.getFileView(
+        config.appwriteStorageId,
+        res.$id
+      );
+
+      const returnData = {
+        link: urlRes,
+        id: res.$id,
+      };
+
+      return returnData;
+    } catch (error: any) {
+      console.error("Image upload failed: ", error);
+      throw new Error(error.message);
+    }
+  };
+
+  //delete photo
+  deletePhoto = async (id: string) => {
+    try {
+      await this.storage.deleteFile(config.appwriteStorageId, id);
+    } catch (error: any) {
+      console.error("Error deleting photo", error.message);
       throw new Error(error.message);
     }
   };

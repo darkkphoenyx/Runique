@@ -5,7 +5,7 @@ import CollectionSidebar from "@/components/collections/sidebar/CollectionSideba
 import { SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import ScrollToTopOnRouteChange from "@/shared/ScrollToTopOnRouteChange";
+import ScrollToTopOnRouteChange from "@/utils/ScrollToTopOnRouteChange";
 import CollectionBreadcrumb from "./CollectionBreadCrumb";
 import { fetchProductDetail } from "@/utils/FetchProductDetails";
 

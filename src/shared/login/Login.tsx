@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import {
   Form,
@@ -18,6 +23,7 @@ import SecondaryButton from "@/components/buttons/SecondaryButton";
 import { useProductStore } from "@/zustand/store";
 import products from "@/appwrite/APIs";
 import type { IUser } from "@/interfaces/IUser";
+import { ROUTES } from "@/routes/ROUTES";
 
 // Zod Schemas
 const loginSchema = z.object({
@@ -43,11 +49,11 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const setUserData = useProductStore((state) => state.setUserData);
-
-  const userData = useProductStore((state) => state.userData);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const location = useLocation();
 
+  const redirect = searchParams.get("redirect");
   type FormValues = {
     name?: string;
     email: string;
@@ -79,14 +85,21 @@ export function Login() {
           role: loginResult.role,
         };
 
-        //keeping the user data in userData store
+        // Save user data in store
         setUserData(res);
+
         toast.success("Signed in successfully!");
-        navigate(-1);
+
+        // Redirect based on role
+        if (res.role === "admin") {
+          navigate(ROUTES.ADMIN.DASHBOARD, { replace: true });
+        } else {
+          const redirectTo = redirect || ROUTES.ROOT.HOME;
+          navigate(redirectTo, { replace: true });
+        }
       } else {
         await products.signup(values);
         toast.success("Account created successfully!");
-
         setIsLogin(true);
         form.reset({
           email: values.email,
