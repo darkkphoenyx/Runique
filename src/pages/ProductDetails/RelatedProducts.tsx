@@ -67,7 +67,7 @@ const RelatedProducts = ({
             opts={{
               align: "start",
             }}
-            className="w-full mx-auto relative border-b-2 pb-10 mb-10"
+            className="w-full mx-auto relative border-b-2 pb-10 mb-10 mt-4"
           >
             <CarouselContent className="mt-4">
               {featuredProductData

@@ -97,7 +97,7 @@ const ProductDetailWrapper = () => {
       <div className="hidden md:block">
         <ProductBreadcrumb title={data.title} />
       </div>
-      <div className="grid lg:grid-cols-2 justify-center max-w-[1000px] mx-auto">
+      <div className="grid lg:grid-cols-2 justify-center max-w-[1000px] mx-auto mb-10">
         {/* Left Section - Image Gallery */}
         <div className="w-full hidden border-none h-fit sticky top-10 lg:flex max-md:justify-center shadow-none p-0 rounded-lg">
           <div className="flex w-[20%] flex-col gap-2 sticky h-fit top-10">
@@ -184,9 +184,11 @@ const ProductDetailWrapper = () => {
       </div>
 
       {/* related products */}
-      <div>
-        <RelatedProducts category={data.categories} slug={data.slug} />
-      </div>
+      {data.categories && (
+        <div>
+          <RelatedProducts category={data.categories} slug={data.slug} />
+        </div>
+      )}
     </div>
   );
 };

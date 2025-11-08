@@ -30,8 +30,8 @@ export const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
   price: z.string().min(1, "Price is required"),
   colorAvailable: z.array(z.string()).min(1, "At least one color is required"),
-  gender: z.string().optional(),
-  kids: z.string().optional(),
+  gender: z.string().min(1, "Select a gender"),
+  kids: z.string().min(1, "Select a Kids category"),
   sizes: z.array(z.string()).min(1, "Please add at least one size"),
   categories: z.string().optional(),
   imgUrl: z.array(z.string()).optional(),
@@ -162,7 +162,10 @@ const AddProduct = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="flex flex-col h-full gap-4"
+      >
         <div className="grid lg:grid-cols-3 lg:gap-6 max-lg:gap-y-6 grid-cols-1 w-full mx-auto">
           <div className="border p-4 flex items-center mx-auto lg:col-span-1 rounded-md w-full">
             <ImageUploader setImages={setImages} form={form} />
@@ -433,7 +436,7 @@ const AddProduct = () => {
 
         <button
           type="submit"
-          className="w-full mt-4 bg-red-600 text-white py-2 rounded-md font-medium text-lg"
+          className="w-full mt-auto bg-red-600 text-white py-2 rounded-md font-medium text-lg"
         >
           Submit
         </button>

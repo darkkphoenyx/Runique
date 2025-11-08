@@ -10,7 +10,7 @@ const CollectionRight = ({ isLoading }: CollectionRightProps) => {
   const productData = useProductStore((state) => state.productData);
 
   const renderSkeletons = () => {
-    return Array.from({ length: 8 }).map((_, index) => (
+    return Array.from({ length: 9 }).map((_, index) => (
       <CollectionCardSkeleton key={index} />
     ));
   };
