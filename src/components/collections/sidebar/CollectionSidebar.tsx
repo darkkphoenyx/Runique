@@ -5,9 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import CollectionBreadcrumb from "@/pages/Collection/CollectionBreadCrumb";
-import { AccordionHeader } from "@radix-ui/react-accordion";
 
 const sidebarData = [
   {
