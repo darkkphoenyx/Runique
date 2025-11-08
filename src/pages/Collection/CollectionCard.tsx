@@ -17,11 +17,16 @@ const CollectionCard = ({ data }: { data: IProductCard }) => {
       onClick={() => handleProductNavigation(data.slug)}
       className="p-0 rounded-none gap-0 border-none shadow-none cursor-pointer active:scale-[98%] transition-all duration-300"
     >
-      <img
-        className="w-full min-h-max object-cover"
-        src={data.imgUrl[0]}
-        alt="card image"
-      />
+      <div className="md:h-[500px] h-[200px]">
+        <img
+          className="w-full h-full object-cover border"
+          src={
+            data.imgUrl[0] ||
+            "https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg"
+          }
+          alt="card image"
+        />
+      </div>
       <CardHeader className="md:mt-3 mt-2 text-red-600 font-medium p-0 max-sm:text-xs">
         {data.header}
       </CardHeader>

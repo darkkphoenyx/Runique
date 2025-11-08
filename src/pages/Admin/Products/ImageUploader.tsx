@@ -23,7 +23,7 @@ export default function ImageUploader({ setImages, form }: ImageUploaderProps) {
       setImages((prev) => [...prev, res]);
 
       // Update form imgUrl field directly
-      form.setValue("imgUrl", [...form.getValues("imgUrl"), res]);
+      form.setValue("imgUrl", [...form.getValues("imgUrl"), res.link]);
 
       toast.success("Photo uploaded");
     } catch (error) {
@@ -60,7 +60,7 @@ export default function ImageUploader({ setImages, form }: ImageUploaderProps) {
 
   return (
     <>
-      <div className="mx-auto max-w-md">
+      <div className="mx-auto w-full">
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}

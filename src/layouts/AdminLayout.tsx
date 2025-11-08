@@ -1,19 +1,12 @@
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { fetchProductDetail } from "@/utils/FetchProductDetails";
-import { useProductStore } from "@/zustand/store";
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { useEffectOnce } from "react-use";
 
 const AdminLayout = () => {
   const location = useLocation();
   const pathname = location.pathname.split("/");
   let header: string;
-  const productData = useProductStore((state) => state.productData);
-  const [selectedFilters, setSelectedFilters] = useState<
-    Record<string, string[]>
-  >({});
 
   //to extract pathname from url -> /admin/dashboar => gives Dashboard
   (() => {
@@ -23,24 +16,6 @@ const AdminLayout = () => {
   })();
 
   const [isOpen, setIsOpen] = useState(true);
-
-  const setProductData = useProductStore((state) => state.setProductData);
-
-  // load the store
-  useEffectOnce(() => {
-    const loadProductStore = async () => {
-      try {
-        const res = await fetchProductDetail(selectedFilters);
-        setProductData(res);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (productData.length === 0) {
-      loadProductStore();
-      setSelectedFilters({});
-    }
-  });
 
   return (
     <SidebarProvider defaultOpen={true}>

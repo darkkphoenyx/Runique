@@ -1,28 +1,42 @@
 import CollectionCardSkeleton from "@/components/skeletons/CollectionCardSkeleton";
 import CollectionCard from "@/pages/Collection/CollectionCard";
+import { fetchProductDetail } from "@/utils/FetchProductDetails";
 import { useProductStore } from "@/zustand/store";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffectOnce } from "react-use";
 
 const Products = () => {
   const productData = useProductStore((state) => state.productData);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const setProductData = useProductStore((state) => state.setProductData);
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
 
-  useEffectOnce(() => {
-    const id = setTimeout(() => {
-      setIsLoading(false);
-    }, 200);
-
-    return () => clearTimeout(id);
-  });
   const renderSkeletons = () => {
     return Array.from({ length: 8 }).map((_, index) => (
       <CollectionCardSkeleton key={index} />
     ));
   };
+
+  // load the store
+  useEffect(() => {
+    const loadProductStore = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetchProductDetail(selectedFilters);
+        setProductData(res);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadProductStore();
+    setSelectedFilters({});
+  }, []);
 
   const handleAddProduct = () => {
     navigate("/admin/add-products");
@@ -31,8 +45,8 @@ const Products = () => {
   return (
     <>
       {/* add product */}
-      <div className="sticky top-17 h-fit bg-white pt-4">
-        <div className="flex items-center justify-between mb-4">
+      <div className="sticky top-17 h-fit bg-white pt-4 z-20">
+        <div className="flex items-center justify-between mb-4 ">
           <h2 className="md:text-sm text-xs text-gray-500">
             Manage all your products here.
           </h2>
@@ -63,7 +77,7 @@ const Products = () => {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-x-4 gap-y-16 mt-8">
+      <div className="grid md:grid-cols-3 grid-cols-2 gap-x-4 gap-y-16 mt-8">
         {isLoading
           ? renderSkeletons()
           : productData.map((card) => (

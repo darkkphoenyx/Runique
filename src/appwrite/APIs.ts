@@ -2,6 +2,7 @@ import { Client, Databases, ID, Query, Storage } from "appwrite";
 import config from "../config/config";
 import bcrypt from "bcryptjs";
 import { Coffee } from "lucide-react";
+import { $ZodCheckGreaterThan } from "zod/v4/core";
 
 export class Products {
   client = new Client();
@@ -525,6 +526,22 @@ export class Products {
       await this.storage.deleteFile(config.appwriteStorageId, id);
     } catch (error: any) {
       console.error("Error deleting photo", error.message);
+      throw new Error(error.message);
+    }
+  };
+
+  //add product
+  addProduct = async (data: any) => {
+    try {
+      const res = await this.database.createDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId1,
+        ID.unique(),
+        data
+      );
+      console.log(res);
+    } catch (error: any) {
+      console.error("Error adding product", error.message);
       throw new Error(error.message);
     }
   };

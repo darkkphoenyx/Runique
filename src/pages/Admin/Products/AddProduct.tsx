@@ -28,7 +28,7 @@ export const formSchema = z.object({
   title: z.string().min(1, "Name is required"),
   header: z.string().min(1, "Header is required"),
   description: z.string().min(1, "Description is required"),
-  price: z.string().min(1, "Price must be greater than 0"),
+  price: z.string().min(1, "Price is required"),
   colorAvailable: z.array(z.string()).min(1, "At least one color is required"),
   gender: z.string().optional(),
   kids: z.string().optional(),
@@ -45,6 +45,20 @@ export interface Iimage {
   link: string;
   id: string;
 }
+
+const sizes = [
+  "22",
+  "24",
+  "26",
+  "28",
+  "30",
+  "32",
+  "34",
+  "36",
+  "38",
+  "40",
+  "42",
+];
 
 const AddProduct = () => {
   const [images, setImages] = useState<Iimage[]>([]);
@@ -65,10 +79,6 @@ const AddProduct = () => {
       slug: "",
     },
   });
-
-  const handleSubmit = (data: FormSchemaType) => {
-    console.log(data);
-  };
 
   // Generate slug based on title
   useEffect(() => {
@@ -98,10 +108,10 @@ const AddProduct = () => {
   const handleRemoveImage = async (id: string) => {
     try {
       await products.deletePhoto(id);
-      //delete the image from the image array
+      // Delete the image from the image array
       setImages((prev) => prev.filter((temp) => temp.id !== id));
 
-      //delete it from the form also
+      // Delete it from the form also
       const updatedImgUrls = (form.getValues("imgUrl") ?? []).filter(
         (url: string) => {
           return !images.some((img) => img.id === id && img.link === url);
@@ -117,20 +127,52 @@ const AddProduct = () => {
     }
   };
 
-  console.log("data is:", images);
+  const handleSubmit = async (data: FormSchemaType) => {
+    const priceAsNumber = parseFloat(data.price);
+
+    if (isNaN(priceAsNumber)) {
+      toast.error("Invalid price entered");
+      return;
+    }
+
+    console.log("Price as number: ", priceAsNumber);
+    console.log("Price as number: ", typeof priceAsNumber);
+
+    // Changing price from string to number
+    const processedData = {
+      ...data,
+      price: priceAsNumber,
+    };
+
+    try {
+      await products.addProduct(processedData);
+      toast.success("Product added!");
+    } catch (error) {
+      console.error(error);
+    }
+    console.log("Form Data:", processedData);
+  };
+
+  useEffect(() => {
+    const errors = form.formState.errors;
+    if (Object.keys(errors).length > 0) {
+      console.log("Form Errors:", errors);
+    }
+  }, [form.formState.errors]);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="grid grid-cols-3 gap-6">
-          <div className="border p-4 flex items-center col-span-1 rounded-md">
+        <div className="grid lg:grid-cols-3 lg:gap-6 max-lg:gap-y-6 grid-cols-1 w-full mx-auto">
+          <div className="border p-4 flex items-center mx-auto lg:col-span-1 rounded-md w-full">
             <ImageUploader setImages={setImages} form={form} />
           </div>
 
           <div className="col-span-2">
-            <div className=" grid grid-cols-2 gap-6 w-full">
+            <div className="grid md:grid-cols-2 gap-6 w-full">
               {/* section 2A */}
               <div className="flex flex-col gap-6">
-                {/* name */}
+                {/* Name */}
                 <FormField
                   control={form.control}
                   name="title"
@@ -149,7 +191,7 @@ const AddProduct = () => {
                   )}
                 />
 
-                {/* gender */}
+                {/* Gender */}
                 <FormField
                   control={form.control}
                   name="gender"
@@ -166,9 +208,9 @@ const AddProduct = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="male">Male</SelectItem>
-                              <SelectItem value="female">Female</SelectItem>
-                              <SelectItem defaultChecked value="unisex">
+                              <SelectItem value="Men">Men</SelectItem>
+                              <SelectItem value="Women">Women</SelectItem>
+                              <SelectItem defaultChecked value="Unisex">
                                 Unisex
                               </SelectItem>
                             </SelectGroup>
@@ -180,7 +222,7 @@ const AddProduct = () => {
                   )}
                 />
 
-                {/* type */}
+                {/* Type */}
                 <FormField
                   control={form.control}
                   name="type"
@@ -190,7 +232,7 @@ const AddProduct = () => {
                       <FormControl>
                         <input
                           className="outline-none border p-2 rounded-md"
-                          placeholder="Mens's shoes"
+                          placeholder="Men's shoes"
                           {...field}
                         />
                       </FormControl>
@@ -199,14 +241,14 @@ const AddProduct = () => {
                   )}
                 />
 
-                {/* available colors */}
+                {/* Available Colors */}
                 <TagInputFiels
                   form={form}
                   label="Colors"
                   name="colorAvailable"
                 />
 
-                {/* description */}
+                {/* Description */}
                 <FormField
                   control={form.control}
                   name="description"
@@ -215,8 +257,8 @@ const AddProduct = () => {
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <textarea
-                          className="rounded-md outline-none border p-2 h-[120px] resize-none"
-                          placeholder="This is the second installement in the Blade X series from Goldstar."
+                          className="rounded-md outline-none border p-2 lg:h-[113px] md:h-[220px] h-[120px] resize-none"
+                          placeholder="This is the second installment in the Blade X series from Goldstar."
                           {...field}
                         />
                       </FormControl>
@@ -228,7 +270,7 @@ const AddProduct = () => {
 
               {/* section 2B */}
               <div className="flex flex-col gap-6">
-                {/* price */}
+                {/* Header */}
                 <FormField
                   control={form.control}
                   name="header"
@@ -247,7 +289,7 @@ const AddProduct = () => {
                   )}
                 />
 
-                {/* kids */}
+                {/* Kids */}
                 <FormField
                   control={form.control}
                   name="kids"
@@ -264,8 +306,8 @@ const AddProduct = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="boy">Boy</SelectItem>
-                              <SelectItem value="girl">Girl</SelectItem>
+                              <SelectItem value="Boy">Boy</SelectItem>
+                              <SelectItem value="Girl">Girl</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -275,7 +317,7 @@ const AddProduct = () => {
                   )}
                 />
 
-                {/* slug */}
+                {/* Slug */}
                 <FormField
                   control={form.control}
                   name="slug"
@@ -285,8 +327,8 @@ const AddProduct = () => {
                       <FormControl>
                         <input
                           disabled
-                          className="outline-none border p-2 rounded-md  text-gray-500"
-                          placeholder="will be auto generated"
+                          className="outline-none border p-2 rounded-md text-gray-500"
+                          placeholder="Will be auto-generated"
                           {...field}
                         />
                       </FormControl>
@@ -294,7 +336,8 @@ const AddProduct = () => {
                     </FormItem>
                   )}
                 />
-                {/* price */}
+
+                {/* Price */}
                 <FormField
                   control={form.control}
                   name="price"
@@ -303,6 +346,7 @@ const AddProduct = () => {
                       <FormLabel>Price</FormLabel>
                       <FormControl>
                         <input
+                          type="number"
                           className="outline-none border p-2 rounded-md"
                           placeholder="Rs. XXXX"
                           {...field}
@@ -313,12 +357,45 @@ const AddProduct = () => {
                   )}
                 />
 
-                {/* available sizes */}
-                <TagInputFiels
-                  form={form}
-                  label="Sizes"
+                {/* Available Sizes */}
+                <FormField
+                  control={form.control}
                   name="sizes"
-                  classname="h-[120px]"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Available Sizes</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-wrap gap-3 border p-2 rounded-md">
+                          {sizes.map((size) => {
+                            const selected = field.value.includes(size); // Check if the size is selected
+                            return (
+                              <button
+                                key={size}
+                                type="button"
+                                onClick={() => {
+                                  const newSelected = selected
+                                    ? field.value.filter(
+                                        (s: string) => s !== size
+                                      )
+                                    : [...field.value, size];
+
+                                  field.onChange(newSelected);
+                                }}
+                                className={`${
+                                  selected
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-gray-200 text-gray-700"
+                                } border border-gray-300 rounded-md py-2 px-4 transition-colors hover:bg-blue-500 focus:outline-none`}
+                              >
+                                {size}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
             </div>
@@ -354,7 +431,12 @@ const AddProduct = () => {
           </div>
         </div>
 
-        <button type="submit">Submit</button>
+        <button
+          type="submit"
+          className="w-full mt-4 bg-red-600 text-white py-2 rounded-md font-medium text-lg"
+        >
+          Submit
+        </button>
       </form>
     </Form>
   );

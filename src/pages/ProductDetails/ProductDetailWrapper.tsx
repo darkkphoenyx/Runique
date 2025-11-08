@@ -116,8 +116,12 @@ const ProductDetailWrapper = () => {
             ))}
           </div>
           <img
-            className="lg:h-[530px] md:h-[400px] h-auto w-[520px] object-cover rounded-lg"
-            src={activeImageUrl || data.imgUrl[0]}
+            className="lg:h-[530px] md:h-[400px] h-auto w-[430px] object-cover rounded-lg border"
+            src={
+              activeImageUrl ||
+              data.imgUrl[0] ||
+              "https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg"
+            }
             alt={data.title}
           />
         </div>
