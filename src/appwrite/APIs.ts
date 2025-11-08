@@ -1,8 +1,6 @@
 import { Client, Databases, ID, Query, Storage } from "appwrite";
 import config from "../config/config";
 import bcrypt from "bcryptjs";
-import { Coffee } from "lucide-react";
-import { $ZodCheckGreaterThan } from "zod/v4/core";
 
 export class Products {
   client = new Client();
