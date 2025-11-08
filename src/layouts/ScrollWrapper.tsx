@@ -1,5 +1,5 @@
 import Footer from "@/components/footer/Footer";
-import ScrollToTopOnRouteChange from "@/shared/ScrollToTopOnRouteChange";
+import ScrollToTopOnRouteChange from "@/utils/ScrollToTopOnRouteChange";
 import { Outlet } from "react-router-dom";
 
 const ScrollWrapper = () => {

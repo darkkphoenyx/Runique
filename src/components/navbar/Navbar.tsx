@@ -1,7 +1,7 @@
 import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Sheet,
   SheetClose,
@@ -11,6 +11,10 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 import SecondaryButton from "../buttons/SecondaryButton";
+import { useProductStore } from "@/zustand/store";
+import { fetchCartData } from "@/utils/FetchCartItem";
+import { toast } from "sonner";
+import products from "@/appwrite/APIs";
 
 const navItem = [
   {
@@ -23,11 +27,6 @@ const navItem = [
     link: "/shop",
     name: "Shop",
   },
-  {
-    id: 3,
-    link: "/contact",
-    name: "Contact",
-  },
 ];
 
 const Navbar = () => {
@@ -35,10 +34,32 @@ const Navbar = () => {
   const [hideNavbar, setHideNavbar] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const userData = useProductStore((state) => state.userData);
+  const bagData = useProductStore((state) => state.bagData);
+  const favourite = useProductStore((state) => state.favouriteData);
+  const setBagData = useProductStore((state) => state.setBagData);
+  const setFavouriteData = useProductStore((state) => state.setFavouriteData);
+  const clearUserData = useProductStore((state) => state.clearUserData);
+  const clearBagData = useProductStore((state) => state.clearBagData);
+  const userId = userData?.id || ""; //typesafety for userId
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      if (userId) {
+        const cartData = await fetchCartData(userId);
+        const favouriteData: any = await products.getFavourites();
+        setFavouriteData(favouriteData.documents);
+        setBagData(cartData);
+      }
+    };
+
+    loadCart();
+  }, [userId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,6 +78,21 @@ const Navbar = () => {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+
+  const handleLogout = (userType: string | undefined) => {
+    if (userType?.toUpperCase() === "USER") {
+      localStorage.removeItem("isLogin");
+      clearUserData();
+      clearBagData();
+    } else {
+      localStorage.removeItem("isLogin");
+      localStorage.removeItem("isAdmin");
+    }
+    toast.success("Logged out.");
+    navigate("/");
+  };
+
+  // const favouriteItemCount = bagData.filter((data) => data.isFavourite);
 
   const isProduct = location.pathname.includes("p/");
   return (
@@ -105,13 +141,25 @@ const Navbar = () => {
           </NavLink>
 
           {/* favourites */}
-          <NavLink to={"/favourite"}>
+          <NavLink to={"/favourite"} className="relative">
             <Heart />
+            {bagData.length > 0 && (
+              <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                {favourite.length}
+              </span>
+            )}
           </NavLink>
 
           {/* add to bag */}
-          <NavLink to={"/cart"}>
+          <NavLink to={"/cart"} className="relative">
             <ShoppingCart />
+
+            {/* cart item number */}
+            {bagData.length > 0 && (
+              <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                {bagData.length}
+              </span>
+            )}
           </NavLink>
         </div>
 
@@ -124,8 +172,15 @@ const Navbar = () => {
                   <User />
                 </NavLink>
 
-                <NavLink to={"/cart"}>
+                <NavLink to={"/cart"} className="relative">
                   <ShoppingCart />
+
+                  {/* cart item number */}
+                  {bagData.length > 0 && (
+                    <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                      {bagData.length}
+                    </span>
+                  )}
                 </NavLink>
               </div>
               <Menu />
@@ -165,22 +220,48 @@ const Navbar = () => {
               </p>
 
               <div>
-                <Link to={"/login"}>
-                  <SecondaryButton
-                    title="Sign in"
-                    className="bg-white text-black border-gray-400 rounded-full border hover:text-white"
-                  />
-                </Link>
+                {userId ? (
+                  <div onClick={() => handleLogout(userData?.role)}>
+                    <SecondaryButton
+                      title={"Logout"}
+                      className="bg-white text-black border-gray-400 rounded-full border hover:text-white"
+                    />
+                  </div>
+                ) : (
+                  <Link to={"/login"}>
+                    <SecondaryButton
+                      title={"Sign in"}
+                      className="bg-white text-black border-gray-400 rounded-full border hover:text-white"
+                    />
+                  </Link>
+                )}
               </div>
             </div>
 
             <div className="gap-4 flex flex-col pb-4">
               <NavLink to={"/favourite"} className="flex gap-2 font-medium">
-                <Heart /> Favourites
+                <p className="relative">
+                  <Heart />
+                  {bagData.length > 0 && (
+                    <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                      {favourite.length}
+                    </span>
+                  )}
+                </p>
+                Favourites
               </NavLink>
 
-              <NavLink to={"/cart"} className="flex gap-2 font-medium">
-                <ShoppingCart /> Bag
+              <NavLink to={"/cart"} className="flex gap-2 font-medium ">
+                <div className="relative">
+                  <ShoppingCart />
+                  {/* cart item number */}
+                  {bagData.length > 0 && (
+                    <span className="absolute rounded-full h-4 w-4 flex items-center justify-center text-xs text-white -top-1 -right-1 bg-red-600">
+                      {bagData.length}
+                    </span>
+                  )}
+                </div>
+                Bag
               </NavLink>
             </div>
 

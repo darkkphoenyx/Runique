@@ -6,19 +6,21 @@ import { toast } from "sonner";
 
 const ProfileDetails = () => {
   const userData = useProductStore((state) => state.userData);
+  const clearUserData = useProductStore((state) => state.clearUserData);
+  const clearBagData = useProductStore((state) => state.clearBagData);
   const navigate = useNavigate();
 
-  // handleLogout
   const handleLogout = (userType: string | undefined) => {
-    console.log("logout pressed");
     if (userType?.toUpperCase() === "USER") {
       localStorage.removeItem("isLogin");
+      clearUserData();
+      clearBagData();
     } else {
       localStorage.removeItem("isLogin");
       localStorage.removeItem("isAdmin");
     }
     toast.success("Logged out.");
-    navigate(-1);
+    navigate("/");
   };
 
   return (
@@ -65,7 +67,7 @@ const ProfileDetails = () => {
       {/* Logout button */}
       <button
         onClick={() => handleLogout(userData?.role)}
-        className="bg-red-600 mb-4 mt-auto w-full hover:bg-red-700 text-lg active:scale-95 cursor-pointer card-nav-cta-button md:inline-flex border-0 rounded-lg px-4 py-2  font-medium transition-colors duration-300 text-white text-center items-center justify-center"
+        className="bg-red-600 mb-4 mt-auto w-full hover:bg-red-700 text-lg cursor-pointer card-nav-cta-button md:inline-flex border-0 rounded-lg px-4 py-2  font-medium transition-colors duration-300 text-white text-center items-center justify-center"
       >
         Logout
       </button>

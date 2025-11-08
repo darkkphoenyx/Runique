@@ -205,6 +205,20 @@ export class Products {
     }
   };
 
+  // get product by id
+  getProductById = async (id: string) => {
+    try {
+      const res = await this.database.getDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId1,
+        id
+      );
+      return res;
+    } catch (error) {
+      throw new Error(`Error getting product by ID: ${error}`);
+    }
+  };
+
   //get featured section
   getProductsByCategoryName = async (name: string) => {
     const categoryRes = await this.database.listDocuments(
@@ -250,22 +264,282 @@ export class Products {
   ) => {
     try {
       if (!size) throw new Error("Select size");
-      const res = await this.database.createDocument(
+
+      const duplicateOrder = await this.database.listDocuments(
         config.appwriteDatabaseId,
         config.appwriteCollectionId4,
-        ID.unique(),
-        {
-          price: price * quantity,
-          users: userId,
-          products: productId,
-          quantity: quantity,
-          size: size,
-        }
+        [
+          Query.equal("users", userId),
+          Query.equal("products", productId),
+          Query.equal("size", size),
+        ]
       );
 
-      return res;
+      // checking if duplicate data exists
+
+      //here we are checking the productId, userID and the size-> cause each size should count as a different order even tho the user and products are exactly the same
+      if (duplicateOrder.total > 0) {
+        const res = await this.database.updateDocument(
+          config.appwriteDatabaseId,
+          config.appwriteCollectionId4,
+          duplicateOrder.documents[0].$id,
+          {
+            price: price * Math.abs(quantity), //forcing positive quantity
+            users: userId,
+            products: productId,
+            quantity: duplicateOrder.documents[0].quantity + quantity,
+            size: size,
+            isFavourite: false,
+          }
+        );
+
+        return res;
+      } else {
+        const res = await this.database.createDocument(
+          config.appwriteDatabaseId,
+          config.appwriteCollectionId4,
+          ID.unique(),
+          {
+            price: price * quantity,
+            users: userId,
+            products: productId,
+            quantity: quantity,
+            size: size,
+            isFavourite: false,
+          }
+        );
+        return res;
+      }
     } catch (error: any) {
       console.error("Order placing failed:", error);
+      throw new Error(error.message);
+    }
+  };
+
+  // Function to increase the quantity
+  increaseQuantity = async (
+    userId: string,
+    productId: string,
+    size: number,
+    price: number
+  ) => {
+    try {
+      return await this.orderItems(userId, productId, 1, size, price);
+    } catch (error: any) {
+      console.error("Failed to increase quantity:", error);
+      throw new Error(error.message);
+    }
+  };
+
+  // Function to decrease the quantity
+  decreaseQuantity = async (
+    userId: string,
+    productId: string,
+    size: number,
+    price: number
+  ) => {
+    try {
+      return await this.orderItems(userId, productId, -1, size, price);
+    } catch (error: any) {
+      console.error("Failed to decrease quantity:", error);
+      throw new Error(error.message);
+    }
+  };
+
+  //delete order item
+  deleteOrderItems = async (id: string) => {
+    try {
+      this.database.deleteDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId4,
+        id
+      );
+    } catch (error: any) {
+      console.error("Failed to delete items", error);
+      throw new Error(error.message);
+    }
+  };
+
+  // fetch bag item
+  fetchBag = async (userId: string) => {
+    try {
+      const res = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId4,
+        [Query.equal("users", userId)]
+      );
+      return res.documents;
+    } catch (error: any) {
+      console.error("Order placing failed:", error);
+      throw new Error(error.message);
+    }
+  };
+
+  //add to favourite
+  addToFavourite = async (
+    userId: string,
+    productId: string
+  ): Promise<number> => {
+    try {
+      const existingFavourites = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5,
+        [Query.equal("userId", userId), Query.equal("productId", productId)]
+      );
+
+      if (existingFavourites.total > 0) {
+        console.warn(
+          `Favourite already exists for user: ${userId}, product: ${productId}`
+        );
+        return 409;
+      }
+
+      const product = await this.database.getDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId1,
+        productId
+      );
+
+      if (!product) {
+        console.warn(`Product not found: ${productId}`);
+        return 404;
+      }
+
+      const favouritePayload = {
+        userId,
+        productId,
+        productName: product.title ?? "Unknown Product",
+        productImage: Array.isArray(product.imgUrl) ? product.imgUrl[0] : null,
+        type: product.header ?? "Unknown Type",
+        colors: Array.isArray(product.colorAvailable)
+          ? product.colorAvailable.length
+          : 0,
+        price: product.price ?? 0,
+        slug: product.slug ?? "",
+      };
+
+      await this.database.createDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5,
+        ID.unique(),
+        favouritePayload
+      );
+
+      return 201;
+    } catch (error: any) {
+      console.error("Failed to add favourite:", error.message || error);
+      throw new Error(
+        `Failed to add favourite: ${error.message || "Unknown error"}`
+      );
+    }
+  };
+
+  //delete from favourite
+  deleteFavourite = async (userId: string, productId: string) => {
+    try {
+      //fetch the id using the userid and productid
+      const deleteId = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5,
+        [
+          Query.equal("userId", userId),
+          Query.equal("productId", productId),
+          Query.select(["$id"]),
+        ]
+      );
+
+      await this.database.deleteDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5,
+        deleteId.documents[0].$id
+      );
+    } catch (error: any) {
+      console.error("Failed to delete: ", error);
+      throw new Error(error.message);
+    }
+  };
+
+  //get favourites
+  getFavourites = async () => {
+    try {
+      const res = await this.database.listDocuments(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId5
+      );
+      return res;
+    } catch (error: any) {
+      console.error("Failed to get Favourties", error);
+      throw new Error(error.message);
+    }
+  };
+
+  // toggle favourite
+  toggleFavourite = async (id: string, isFavourite: boolean) => {
+    try {
+      const res = await this.database.updateDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId4,
+        id,
+        {
+          isFavourite: !isFavourite,
+        }
+      );
+      return res;
+    } catch (error: any) {
+      console.error("Toggle Favourite failed: ", error);
+      throw new Error(error.message);
+    }
+  };
+
+  //upload photo
+  uploadPhoto = async (file: File) => {
+    try {
+      const res = await this.storage.createFile(
+        config.appwriteStorageId,
+        ID.unique(),
+        file
+      );
+
+      //retrieve the URL
+      const urlRes = await this.storage.getFileView(
+        config.appwriteStorageId,
+        res.$id
+      );
+
+      const returnData = {
+        link: urlRes,
+        id: res.$id,
+      };
+
+      return returnData;
+    } catch (error: any) {
+      console.error("Image upload failed: ", error);
+      throw new Error(error.message);
+    }
+  };
+
+  //delete photo
+  deletePhoto = async (id: string) => {
+    try {
+      await this.storage.deleteFile(config.appwriteStorageId, id);
+    } catch (error: any) {
+      console.error("Error deleting photo", error.message);
+      throw new Error(error.message);
+    }
+  };
+
+  //add product
+  addProduct = async (data: any) => {
+    try {
+      const res = await this.database.createDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId1,
+        ID.unique(),
+        data
+      );
+      console.log(res);
+    } catch (error: any) {
+      console.error("Error adding product", error.message);
       throw new Error(error.message);
     }
   };

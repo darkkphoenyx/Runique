@@ -1,7 +1,8 @@
+// layouts/MainLayout.tsx
 import Navbar from "@/components/navbar/Navbar";
 import { Outlet } from "react-router-dom";
 
-const OpenRoutes = () => {
+const MainLayout = () => {
   return (
     <div>
       <Navbar />
@@ -12,4 +13,4 @@ const OpenRoutes = () => {
   );
 };
 
-export default OpenRoutes;
+export default MainLayout;

@@ -9,7 +9,6 @@ import { useProductStore } from "@/zustand/store";
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import products from "@/appwrite/APIs";
-import PrimaryButton from "@/components/buttons/PrimaryButton";
 import ProductDetailsSkeleton from "@/components/skeletons/ProductDetailsSkeleton";
 import ShoesSizeGrid from "./ShoesSizeGrid";
 import PhotoCarousel from "./PhotoCarousel";
@@ -94,9 +93,11 @@ const ProductDetailWrapper = () => {
   }
 
   return (
-    <div className="pt-[100px] px-4 h-full">
-      <ProductBreadcrumb title={data.title} />
-      <div className="grid lg:grid-cols-2 justify-center max-w-[1000px] mx-auto">
+    <div className="md:pt-[100px] pt-[80px] px-4 h-full">
+      <div className="hidden md:block">
+        <ProductBreadcrumb title={data.title} />
+      </div>
+      <div className="grid lg:grid-cols-2 justify-center max-w-[1000px] mx-auto mb-10">
         {/* Left Section - Image Gallery */}
         <div className="w-full hidden border-none h-fit sticky top-10 lg:flex max-md:justify-center shadow-none p-0 rounded-lg">
           <div className="flex w-[20%] flex-col gap-2 sticky h-fit top-10">
@@ -115,8 +116,12 @@ const ProductDetailWrapper = () => {
             ))}
           </div>
           <img
-            className="lg:h-[530px] md:h-[400px] h-auto w-[520px] object-cover rounded-lg"
-            src={activeImageUrl || data.imgUrl[0]}
+            className="lg:h-[530px] md:h-[400px] h-auto w-[430px] object-cover rounded-lg border"
+            src={
+              activeImageUrl ||
+              data.imgUrl[0] ||
+              "https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg"
+            }
             alt={data.title}
           />
         </div>
@@ -124,14 +129,14 @@ const ProductDetailWrapper = () => {
         {/* Right Section - Product Info */}
         <Card className="border-none shadow-none p-0 gap-0 lg:w-[90%] w-[100%] mx-auto">
           <div>
-            <CardHeader className="text-red-600 font-medium p-0 text-sm">
+            <CardHeader className="text-red-600 font-medium p-0 md:text-sm text-xs">
               {data.header}
             </CardHeader>
-            <CardTitle className="md:text-xl text-lg -mt-2">
-              {data.title}
-            </CardTitle>
+            <CardTitle className="text-xl -mt-2">{data.title}</CardTitle>
             <CardDescription className="text-sm">{data.type}</CardDescription>
-            <p className="mt-2 text-lg font-medium">MRP: {data.price}</p>
+            <p className="mt-2 text-lg  font-medium text-red-600">
+              Rs. {data.price}
+            </p>
             <p className="mt-2 text-xs text-gray-500">
               Inclusive of all taxes <br />
               (Also includes all applicable duties)
@@ -149,19 +154,6 @@ const ProductDetailWrapper = () => {
             productId={data.id}
             sizeData={data.sizes}
           />
-
-          <div className="mt-[40px] w-full flex flex-col gap-y-2">
-            <PrimaryButton
-              title="Add to Bag"
-              link=""
-              className="bg-black text-white text-sm w-full py-6"
-            />
-            <PrimaryButton
-              link=""
-              title="Favourite"
-              className="bg-white text-black text-sm border border-black w-full py-6"
-            />
-          </div>
 
           {/* description and color options */}
           <div className="mt-8">
@@ -192,9 +184,11 @@ const ProductDetailWrapper = () => {
       </div>
 
       {/* related products */}
-      <div>
-        <RelatedProducts category={data.categories} slug={data.slug} />
-      </div>
+      {data.categories && (
+        <div>
+          <RelatedProducts category={data.categories} slug={data.slug} />
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import products from "@/appwrite/APIs";
+import { fetchCartData } from "@/utils/FetchCartItem";
 import { useProductStore } from "@/zustand/store";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +35,9 @@ const ShoesSizeGrid = ({
   const userData = useProductStore((state) => state.userData);
   const selectedSize = watch("size");
   const navigate = useNavigate();
+  const setBagData = useProductStore((state) => state.setBagData);
+  const setFavouriteData = useProductStore((state) => state.setFavouriteData);
+  const userId = userData?.id || "";
 
   const onSubmit = async (data: FormData) => {
     if (localStorage.getItem("isLogin") !== "true") {
@@ -55,6 +59,9 @@ const ShoesSizeGrid = ({
         price
       );
       toast.success("Added to bag!");
+      // updating the cart items
+      const cartData = await fetchCartData(userId);
+      setBagData(cartData);
     } catch (error: any) {
       toast.error(error.message);
       console.error("Booking failed", error);
@@ -62,6 +69,22 @@ const ShoesSizeGrid = ({
   };
   const selectSize = (size: number) =>
     setValue("size", size, { shouldValidate: true });
+
+  const addToFavourite = async (userId: string, productId: string) => {
+    try {
+      const res = await products.addToFavourite(userId, productId);
+
+      if (res === 409) toast.error("Already added");
+      else if (res === 201) {
+        const favouriteData: any = await products.getFavourites();
+        setFavouriteData(favouriteData.documents);
+        toast.success("Added to Favourite");
+      } else throw new Error("Failed to Add");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "An unexpected error occurred");
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-10 space-y-3">
@@ -105,11 +128,21 @@ const ShoesSizeGrid = ({
         <p className="text-red-600 mt-1 text-sm">{errors.quantity.message}</p>
       )}
 
+      {/* add to cart button */}
       <button
         type="submit"
-        className="bg-black hover:bg-red-700 mt-8 text-white text-sm py-3.5 rounded-md font-medium transition-all active:scale-95 cursor-pointer w-full  outline-none"
+        className="bg-black  mt-8 text-white text-sm py-3.5 rounded-md font-medium transition-all active:scale-98 cursor-pointer w-full  outline-none"
       >
         Add to Bag
+      </button>
+
+      {/* add to favourite button */}
+      <button
+        onClick={() => addToFavourite(userId, productId)}
+        type="button"
+        className="bg-white hover:bg-red-600 hover:text-white  text-black border border-black hover:border-red-600 text-sm py-3.5 rounded-md font-medium transition-all active:scale-98 cursor-pointer w-full outline-none"
+      >
+        Add to Favourite
       </button>
     </form>
   );
