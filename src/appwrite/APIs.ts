@@ -543,6 +543,35 @@ export class Products {
       throw new Error(error.message);
     }
   };
+
+  //update product
+  updateProduct = async (data: any, id: any) => {
+    try {
+      await this.database.updateDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId1,
+        id,
+        data
+      );
+    } catch (error: any) {
+      console.error("Error updating product", error.message);
+      throw new Error(error.message);
+    }
+  };
+
+  //delete product
+  deleteProduct = async (id: string) => {
+    try {
+      await this.database.deleteDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId1,
+        id
+      );
+    } catch (error: any) {
+      console.error("Error deleting product", error.message);
+      throw new Error(error.message);
+    }
+  };
 }
 
 const products = new Products();

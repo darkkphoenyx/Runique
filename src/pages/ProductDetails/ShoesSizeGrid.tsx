@@ -38,6 +38,9 @@ const ShoesSizeGrid = ({
   const setBagData = useProductStore((state) => state.setBagData);
   const setFavouriteData = useProductStore((state) => state.setFavouriteData);
   const userId = userData?.id || "";
+  const isAdminLoggedIn = JSON.parse(
+    localStorage.getItem("isAdmin") || "false"
+  );
 
   const onSubmit = async (data: FormData) => {
     if (localStorage.getItem("isLogin") !== "true") {
@@ -46,6 +49,8 @@ const ShoesSizeGrid = ({
     }
 
     try {
+      if (isAdminLoggedIn) throw new Error("Unauthorized for Admin.");
+
       if (!userData?.id) {
         toast.error("User ID not found. Please log in again.");
         navigate("/login");
@@ -72,6 +77,7 @@ const ShoesSizeGrid = ({
 
   const addToFavourite = async (userId: string, productId: string) => {
     try {
+      if (isAdminLoggedIn) throw new Error("Unauthorized for Admin.");
       const res = await products.addToFavourite(userId, productId);
 
       if (res === 409) toast.error("Already added");

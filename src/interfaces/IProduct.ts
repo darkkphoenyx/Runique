@@ -6,7 +6,6 @@ export interface IProductCard {
   price: number;
   colorAvailable: string[];
   gender?: string;
-  kids?: string;
   sizes: number[];
   categories: string;
   imgUrl: string[];
