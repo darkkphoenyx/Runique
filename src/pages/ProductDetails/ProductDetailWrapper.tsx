@@ -26,7 +26,6 @@ const mapApiResponseToProductCard = (res: IProductCard): IProductCard => ({
   price: res.price,
   sizes: res.sizes,
   gender: res.gender,
-  kids: res.kids,
   categories: res.categories,
   type: res.type,
   slug: res.slug,

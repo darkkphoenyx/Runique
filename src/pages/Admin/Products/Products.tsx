@@ -77,11 +77,11 @@ const Products = () => {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 grid-cols-2 gap-x-4 gap-y-16 mt-8">
+      <div className="grid lg:grid-cols-3 grid-cols-2 gap-x-4 gap-y-16 mt-8">
         {isLoading
           ? renderSkeletons()
           : productData.map((card) => (
-              <CollectionCard key={card.id} data={card} />
+              <CollectionCard isAdmin key={card.id} data={card} />
             ))}
       </div>
 

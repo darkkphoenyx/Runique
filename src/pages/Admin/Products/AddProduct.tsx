@@ -23,15 +23,16 @@ import ImageUploader from "./ImageUploader";
 import { Trash2 } from "lucide-react";
 import products from "@/appwrite/APIs";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 export const formSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Name is required"),
   header: z.string().min(1, "Header is required"),
   description: z.string().min(1, "Description is required"),
-  price: z.string().min(1, "Price is required"),
+  price: z.number(),
   colorAvailable: z.array(z.string()).min(1, "At least one color is required"),
   gender: z.string().min(1, "Select a gender"),
-  kids: z.string().min(1, "Select a Kids category"),
   sizes: z.array(z.string()).min(1, "Please add at least one size"),
   categories: z.string().optional(),
   imgUrl: z.array(z.string()).optional(),
@@ -62,21 +63,22 @@ const sizes = [
 
 const AddProduct = () => {
   const [images, setImages] = useState<Iimage[]>([]);
+  const location = useLocation();
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      header: "",
-      description: "",
-      price: "",
-      colorAvailable: [],
-      gender: "",
-      kids: "",
-      sizes: [],
-      categories: "",
-      imgUrl: [],
-      type: "",
-      slug: "",
+      id: location.state?.id || "",
+      title: location.state?.title || "",
+      header: location.state?.header || "",
+      description: location.state?.description || "",
+      price: location.state?.price || "",
+      colorAvailable: location.state?.colorAvailable || [],
+      gender: location.state?.gender || "",
+      sizes: location.state?.sizes || [],
+      categories: location.state?.categories || "",
+      imgUrl: location.state?.imgUrl || [],
+      type: location.state?.type || "",
+      slug: location.state?.slug || "",
     },
   });
 
@@ -128,29 +130,31 @@ const AddProduct = () => {
   };
 
   const handleSubmit = async (data: FormSchemaType) => {
-    const priceAsNumber = parseFloat(data.price);
-
-    if (isNaN(priceAsNumber)) {
-      toast.error("Invalid price entered");
-      return;
-    }
-
-    console.log("Price as number: ", priceAsNumber);
-    console.log("Price as number: ", typeof priceAsNumber);
-
-    // Changing price from string to number
     const processedData = {
-      ...data,
-      price: priceAsNumber,
+      categories: data.categories,
+      colorAvailable: data.colorAvailable,
+      description: data.description,
+      header: data.header,
+      imgUrl: data.imgUrl,
+      sizes: data.sizes,
+      slug: data.slug,
+      title: data.title,
+      type: data.type,
+      gender: data.gender,
+      price: data.price,
     };
 
     try {
-      await products.addProduct(processedData);
-      toast.success("Product added!");
+      if (location.state) {
+        await products.updateProduct(processedData, data.id);
+        toast.success("Product updated!");
+      } else {
+        await products.addProduct(processedData);
+        toast.success("Product added!");
+      }
     } catch (error) {
       console.error(error);
     }
-    console.log("Form Data:", processedData);
   };
 
   useEffect(() => {
@@ -292,34 +296,6 @@ const AddProduct = () => {
                   )}
                 />
 
-                {/* Kids */}
-                <FormField
-                  control={form.control}
-                  name="kids"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Kids</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger className="w-full focus-visible:ring-0">
-                            <SelectValue placeholder="Select a gender" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectItem value="Boy">Boy</SelectItem>
-                              <SelectItem value="Girl">Girl</SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 {/* Slug */}
                 <FormField
                   control={form.control}
@@ -353,6 +329,9 @@ const AddProduct = () => {
                           className="outline-none border p-2 rounded-md"
                           placeholder="Rs. XXXX"
                           {...field}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
                         />
                       </FormControl>
                       <FormMessage />

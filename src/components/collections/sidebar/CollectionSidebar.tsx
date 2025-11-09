@@ -16,12 +16,6 @@ const sidebarData = [
   },
   {
     id: 2,
-    title: "Kids",
-    field: "kids", // Must match Appwrite DB field
-    content: ["Boy", "Girl"],
-  },
-  {
-    id: 3,
     title: "Shop by Price",
     field: "price", // Must match Appwrite DB field
     content: ["Under Rs. 4999", "Rs. 5000 - Rs. 14999", "Above Rs.15000"],
@@ -58,20 +52,10 @@ const CollectionSidebar = ({
         delete updatedFilters[field];
       }
 
-      //  Gender and Kids mutually exclusive
-      const isGenderOrKids = field === "gender" || field === "kids";
-      if (!alreadySelected && isGenderOrKids) {
-        const otherField = field === "gender" ? "kids" : "gender";
-        if (updatedFilters[otherField]) {
-          delete updatedFilters[otherField];
-        }
-      }
-
       return updatedFilters;
     });
   };
 
-  const isGenderSelected = !!selectedFilters["gender"]?.length;
   const isKidsSelected = !!selectedFilters["kids"]?.length;
 
   return (
@@ -79,9 +63,7 @@ const CollectionSidebar = ({
       <CollectionBreadcrumb />
       <Accordion type="multiple" className="w-full" defaultValue={["1"]}>
         {sidebarData.map((data) => {
-          const isDisabled =
-            (data.field === "gender" && isKidsSelected) ||
-            (data.field === "kids" && isGenderSelected);
+          const isDisabled = data.field === "gender" && isKidsSelected;
 
           // Calculate number of selected filters for this section
           const selectedCount = selectedFilters[data.field]?.length || 0;
