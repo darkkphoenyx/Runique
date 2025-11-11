@@ -60,7 +60,7 @@ const CollectionRight = ({ isLoading }: CollectionRightProps) => {
         ) : searchQuery.trim() ? (
           filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
-              <CollectionCard isAdmin key={product.id} data={product} />
+              <CollectionCard key={product.id} data={product} />
             ))
           ) : (
             <p className="text-center text-gray-400 col-span-full lg:h-[350px]">
@@ -69,7 +69,7 @@ const CollectionRight = ({ isLoading }: CollectionRightProps) => {
           )
         ) : productData.length > 0 ? (
           productData.map((card) => (
-            <CollectionCard isAdmin key={card.id} data={card} />
+            <CollectionCard key={card.id} data={card} />
           ))
         ) : (
           <p className="text-center text-gray-500 col-span-full lg:h-[350px]">
