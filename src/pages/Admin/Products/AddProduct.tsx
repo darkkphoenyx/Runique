@@ -82,6 +82,7 @@ const AddProduct = () => {
     },
   });
 
+  console.log(location.state.imgUrl);
   // Generate slug based on title
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
@@ -384,6 +385,28 @@ const AddProduct = () => {
 
             {/* Image display section */}
             <div className="mt-6 overflow-hidden min-h-[150px] flex gap-3 border p-2 rounded-md flex-wrap">
+              {location.state.imgUrl.length > 0 && (
+                <>
+                  {location.state.imgUrl.map((item: string, idx: number) => (
+                    <div key={idx} className="relative">
+                      <>
+                        <img
+                          src={item}
+                          alt={`Uploaded Image ${idx}`}
+                          className="h-26 w-auto object-cover shadow-md"
+                        />
+                        {/* <div
+                          onClick={() => handleRemoveImage(item)}
+                          className="absolute top-0 right-0 m-2 cursor-pointer rounded-full bg-white p-2"
+                        >
+                          <Trash2 className="text-red-500" size={16} />
+                        </div> */}
+                      </>
+                    </div>
+                  ))}
+                </>
+              )}
+
               {images.length > 0 ? (
                 <>
                   {images.map((item, idx) => (

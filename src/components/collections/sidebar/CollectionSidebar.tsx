@@ -56,25 +56,17 @@ const CollectionSidebar = ({
     });
   };
 
-  const isKidsSelected = !!selectedFilters["kids"]?.length;
-
   return (
     <div className="h-screen overflow-y-auto fixed lg:w-[185px] md:w-[350px] w-[265px]">
       <CollectionBreadcrumb />
       <Accordion type="multiple" className="w-full" defaultValue={["1"]}>
         {sidebarData.map((data) => {
-          const isDisabled = data.field === "gender" && isKidsSelected;
-
           // Calculate number of selected filters for this section
           const selectedCount = selectedFilters[data.field]?.length || 0;
 
           return (
             <AccordionItem key={data.id} value={String(data.id)}>
-              <AccordionTrigger
-                className={`flex justify-between items-center text-lg hover:no-underline ${
-                  isDisabled ? "text-gray-400" : ""
-                }`}
-              >
+              <AccordionTrigger className="flex justify-between items-center text-lg hover:no-underline">
                 <span className="flex items-center gap-1">
                   {data.title}{" "}
                   <span className="text-sm">
@@ -82,21 +74,13 @@ const CollectionSidebar = ({
                   </span>
                 </span>
               </AccordionTrigger>
-              <AccordionContent
-                className={`flex flex-col gap-1 ${
-                  isDisabled ? "text-gray-400" : ""
-                }`}
-              >
-                <fieldset disabled={isDisabled} className="w-full">
+              <AccordionContent className="flex flex-col gap-1">
+                <fieldset className="w-full">
                   {data.content.map((item) => (
                     <div
                       key={item}
-                      className={`flex gap-1.5 items-center ${
-                        isDisabled ? "cursor-not-allowed" : "cursor-pointer"
-                      }`}
-                      onClick={() =>
-                        !isDisabled && handleFilterSelect(data.field, item)
-                      }
+                      className="flex gap-1.5 items-center cursor-pointer"
+                      onClick={() => handleFilterSelect(data.field, item)}
                     >
                       <Checkbox
                         checked={
@@ -105,11 +89,7 @@ const CollectionSidebar = ({
                         onCheckedChange={() => {}}
                         className="border-black data-[state=checked]:bg-black h-5 w-5 cursor-pointer"
                       />
-                      <p
-                        className={`text-black text-base hover:text-gray-700 ${
-                          isDisabled ? "text-gray-400" : ""
-                        }`}
-                      >
+                      <p className="text-black text-base hover:text-gray-700">
                         {item}
                       </p>
                     </div>
