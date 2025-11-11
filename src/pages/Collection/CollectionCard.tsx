@@ -81,22 +81,21 @@ const CollectionCard = ({
           <div className="flex gap-2 absolute top-2 right-2">
             <button
               onClick={() => handleProductNavigation(data.slug)}
-              className=" transition-all active:scale-[98%] cursor-pointer
-             bg-red-600 text-white text-sm md:px-4 px-2 md:py-2 py-1 rounded-md"
+              className=" transition-all active:scale-[98%] cursor-pointer bg-red-600 text-white text-sm font-medium px-2  py-1 rounded-md"
             >
               Edit
             </button>
             <button
               onClick={() => setOpen(true)}
-              className=" transition-all active:scale-[98%] cursor-pointer
-             bg-red-600 text-white text-sm  px-2  py-1 rounded-md"
+              className=" transition-all active:scale-[98%] cursor-pointer bg-red-600 text-white text-sm px-2 py-1 rounded-md"
             >
-              <Trash2 />
+              <Trash2 size={16} />
             </button>
           </div>
         )}
       </div>
-      {/* alert box */}
+
+      {/* Delete alert box - for admin only*/}
       <AlertDialog open={open} onOpenChange={() => setOpen(false)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -119,6 +118,7 @@ const CollectionCard = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
       <CardHeader className="md:mt-3 mt-2 text-red-600 font-medium p-0 max-sm:text-xs">
         {data.header}
       </CardHeader>
