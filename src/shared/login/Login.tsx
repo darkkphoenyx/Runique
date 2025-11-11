@@ -92,7 +92,7 @@ export function Login() {
 
         // Redirect based on role
         if (res.role === "admin") {
-          navigate(ROUTES.ADMIN.DASHBOARD, { replace: true });
+          navigate(ROUTES.ADMIN.PRODUCTS, { replace: true });
         } else {
           const redirectTo = redirect || ROUTES.ROOT.HOME;
           navigate(redirectTo, { replace: true });
