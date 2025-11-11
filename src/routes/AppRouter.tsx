@@ -13,11 +13,11 @@ import ProfileDetails from "@/shared/login/ProfileDetails";
 import Bag from "@/pages/Bag/Bag";
 import Favourite from "@/pages/Favourite/Favourite";
 import AdminProtectedRoute from "@/layouts/AdminProtectedRoutes";
-import Dashboard from "@/pages/Admin/Dashboard/Dashboard";
 import { Login } from "@/shared/login/Login";
 import NotFound from "@/components/openRoutes/NotFound";
 import Products from "@/pages/Admin/Products/Products";
 import AddProduct from "@/pages/Admin/Products/AddProduct";
+import Profile from "@/pages/Admin/Profile/Profile";
 
 const AppRouter = () => {
   return (
@@ -49,9 +49,9 @@ const AppRouter = () => {
         {/* ADMIN ROUTES */}
         <Route element={<AdminLayout />}>
           <Route element={<AdminProtectedRoute />}>
-            <Route path={ROUTES.ADMIN.DASHBOARD} element={<Dashboard />} />
             <Route path={ROUTES.ADMIN.PRODUCTS} element={<Products />} />
             <Route path={ROUTES.ADMIN.ADD_PRODUCTS} element={<AddProduct />} />
+            <Route path={ROUTES.ADMIN.PROFILE} element={<Profile />} />
           </Route>
         </Route>
 

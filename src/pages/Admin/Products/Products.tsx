@@ -1,12 +1,4 @@
 import CollectionCardSkeleton from "@/components/skeletons/CollectionCardSkeleton";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import CollectionCard from "@/pages/Collection/CollectionCard";
 import { fetchProductDetail } from "@/utils/FetchProductDetails";
 import { useProductStore } from "@/zustand/store";
@@ -77,45 +69,23 @@ const Products = () => {
         </div>
 
         {/* search and filter */}
-        <div className="grid md:grid-cols-12 items-center gap-4 rounded-xl p-4 shadow-md">
-          <div className="relative col-span-6">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full border rounded-md px-3 py-2 pr-8 outline-none"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            )}
-          </div>
 
-          <div className="col-span-2 p-2 rounded-lg text-center">
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a gender" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Unisex">Unisex</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="col-span-2 border p-4 rounded-lg text-center">
-            Price
-          </div>
-          <div className="col-span-2 border p-4 rounded-lg text-center">
-            Latest
-          </div>
+        <div className="relative pb-4">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products..."
+            className="w-full border rounded-md px-3 py-2 pr-8 outline-none"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
