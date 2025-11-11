@@ -3,7 +3,7 @@ import CollectionCard from "@/pages/Collection/CollectionCard";
 import { fetchProductDetail } from "@/utils/FetchProductDetails";
 import { useProductStore } from "@/zustand/store";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Products = () => {
@@ -15,6 +15,16 @@ const Products = () => {
     Record<string, string[]>
   >({});
 
+  //search functionality
+  const searchQuery = useProductStore((state) => state.searchQuery);
+  const setSearchQuery = useProductStore((state) => state.setSearchQuery);
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return productData;
+    return productData.filter((p) =>
+      p.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [productData, searchQuery]);
+
   const renderSkeletons = () => {
     return Array.from({ length: 9 }).map((_, index) => (
       <CollectionCardSkeleton key={index} />
@@ -23,19 +33,18 @@ const Products = () => {
 
   // load the store
   useEffect(() => {
-    const loadProductStore = async () => {
+    setSelectedFilters({});
+    (async () => {
       try {
         setIsLoading(true);
         const res = await fetchProductDetail(selectedFilters);
         setProductData(res);
       } catch (error) {
-        console.log(error);
+        console.error("Failed to load products:", error);
       } finally {
         setIsLoading(false);
       }
-    };
-    loadProductStore();
-    setSelectedFilters({});
+    })();
   }, []);
 
   const handleAddProduct = () => {
@@ -60,29 +69,48 @@ const Products = () => {
         </div>
 
         {/* search and filter */}
-        <div className="grid md:grid-cols-12 items-center gap-2 rounded-xl p-4 shadow-md">
-          <div className="col-span-4 border p-4 rounded-lg">Search</div>
-          <div className="col-span-2 border p-4 rounded-lg text-center">
-            Gender
-          </div>
-          <div className="col-span-2 border p-4 rounded-lg text-center">
-            Kids
-          </div>
-          <div className="col-span-2 border p-4 rounded-lg text-center">
-            Price
-          </div>
-          <div className="col-span-2 border p-4 rounded-lg text-center">
-            Latest
-          </div>
+
+        <div className="relative pb-4">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products..."
+            className="w-full border rounded-md px-3 py-2 pr-8 outline-none"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
       <div className="grid lg:grid-cols-3 grid-cols-2 gap-x-4 gap-y-16 mt-8">
-        {isLoading
-          ? renderSkeletons()
-          : productData.map((card) => (
-              <CollectionCard isAdmin key={card.id} data={card} />
-            ))}
+        {isLoading ? (
+          renderSkeletons()
+        ) : searchQuery.trim() ? (
+          filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <CollectionCard isAdmin key={product.id} data={product} />
+            ))
+          ) : (
+            <p className="text-center text-gray-400 col-span-full">
+              No products found.
+            </p>
+          )
+        ) : productData.length > 0 ? (
+          productData.map((card) => (
+            <CollectionCard isAdmin key={card.id} data={card} />
+          ))
+        ) : (
+          <div className="h-screen -mt-20 flex items-center justify-center text-gray-500">
+            No Item
+          </div>
+        )}
       </div>
 
       {!isLoading && productData.length === 0 && (
