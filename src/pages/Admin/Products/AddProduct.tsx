@@ -384,6 +384,22 @@ const AddProduct = () => {
 
             {/* Image display section */}
             <div className="mt-6 overflow-hidden min-h-[150px] flex gap-3 border p-2 rounded-md flex-wrap">
+              {location.state?.imgUrl?.length > 0 && (
+                <>
+                  {location.state.imgUrl.map((item: string, idx: number) => (
+                    <div key={idx} className="relative">
+                      <>
+                        <img
+                          src={item}
+                          alt={`Uploaded Image ${idx}`}
+                          className="h-26 w-auto object-cover shadow-md"
+                        />
+                      </>
+                    </div>
+                  ))}
+                </>
+              )}
+
               {images.length > 0 ? (
                 <>
                   {images.map((item, idx) => (
