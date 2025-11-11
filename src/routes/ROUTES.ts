@@ -13,7 +13,7 @@ export const ROUTES = {
     FAVOURITE: "/favourite",
   },
   ADMIN: {
-    DASHBOARD: "/admin/dashboard",
+    PROFILE: "/admin/profile",
     PRODUCTS: "/admin/products",
     ADD_PRODUCTS: "/admin/add-products",
   },

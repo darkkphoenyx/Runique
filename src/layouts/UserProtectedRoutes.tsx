@@ -9,7 +9,7 @@ const UserProtectedRoute = () => {
     return <Navigate to={`/login?redirect=${location.pathname}`} replace />;
   }
   if (isAdmin) {
-    return <Navigate to="/admin/dashboard" replace />;
+    return <Navigate to="/admin/products" replace />;
   }
 
   return <Outlet />;
