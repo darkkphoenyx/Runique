@@ -32,7 +32,8 @@ const Bag = () => {
   const bagData = useProductStore((state) => state.bagData);
   const setBagData = useProductStore((state) => state.setBagData);
   const setFavouriteData = useProductStore((state) => state.setFavouriteData);
-  // const favouriteData = useProductStore((state) => state.favouriteData);
+
+  const userData = useProductStore((state) => state.userData);
 
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(0);
@@ -48,7 +49,8 @@ const Bag = () => {
   useEffectOnce(() => {
     (async () => {
       try {
-        const res = await products.getFavourites();
+        const userId = userData?.id ?? "";
+        const res = await products.getFavourites(userId);
         const data: any = res.documents || [];
         setFavouriteData(data);
       } catch (error) {
@@ -75,12 +77,25 @@ const Bag = () => {
     }
   };
 
-  const handleDeleteItem = async (id: string, userId: string) => {
+  const handleDeleteItem = async (
+    id: string,
+    userId: string,
+    productId: string
+  ) => {
     try {
       await products.deleteOrderItems(id);
       setTimeout(async () => {
         const updated = await fetchCartData(userId);
         setBagData(updated);
+
+        //decreasing bias
+        await products.logUserEvent(
+          userId,
+          productId,
+          "remove_from_cart",
+          "cart"
+        );
+
         toast.success("Item deleted");
       }, 500); //this is done prevent the server down time - delay
     } catch (error) {
@@ -114,8 +129,12 @@ const Bag = () => {
   const addToFavourite = async (userId: string, productId: string) => {
     try {
       const res = await products.addToFavourite(userId, productId);
-      const favouriteData: any = await products.getFavourites();
+      const favouriteData: any = await products.getFavourites(userId);
       setFavouriteData(favouriteData.documents);
+
+      //increasing bias
+      await products.logUserEvent(userId, productId, "favourite", "cart");
+
       if (res === 201) toast.success("Added to Favourite");
     } catch (error) {
       toast.error("Failed to add Favourite");
@@ -126,8 +145,16 @@ const Bag = () => {
   const removeFavourite = async (userId: string, productId: string) => {
     try {
       await products.deleteFavourite(userId, productId);
-      const favouriteData: any = await products.getFavourites();
+      const favouriteData: any = await products.getFavourites(userId);
       setFavouriteData(favouriteData.documents);
+
+      //decreasing bias
+      await products.logUserEvent(
+        userId,
+        productId,
+        "favourite_remove",
+        "cart"
+      );
       toast.success("Favourite removed");
     } catch (error) {
       toast.error("Failed to remove favourite");
@@ -196,7 +223,9 @@ const Bag = () => {
                   productId={item.products}
                   isSelected={selectedItems.includes(item.id)}
                   onSelect={() => toggleSelect(item.id)}
-                  onDelete={() => handleDeleteItem(item.id, item.users)}
+                  onDelete={() =>
+                    handleDeleteItem(item.id, item.users, item.products)
+                  }
                   removeFavourite={() =>
                     removeFavourite(item.users, item.products)
                   }

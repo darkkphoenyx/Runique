@@ -27,6 +27,11 @@ const navItem = [
     link: "/shop",
     name: "Shop",
   },
+  {
+    id: 3,
+    link: "/fyp",
+    name: "For You",
+  },
 ];
 
 const Navbar = () => {
@@ -52,7 +57,7 @@ const Navbar = () => {
     const loadCart = async () => {
       if (userId) {
         const cartData = await fetchCartData(userId);
-        const favouriteData: any = await products.getFavourites();
+        const favouriteData: any = await products.getFavourites(userId);
         setFavouriteData(favouriteData.documents);
         setBagData(cartData);
       }

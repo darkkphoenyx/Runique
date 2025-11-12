@@ -460,11 +460,12 @@ export class Products {
   };
 
   //get favourites
-  getFavourites = async () => {
+  getFavourites = async (userId: string) => {
     try {
       const res = await this.database.listDocuments(
         config.appwriteDatabaseId,
-        config.appwriteCollectionId5
+        config.appwriteCollectionId5,
+        [Query.equal("userId", userId)]
       );
       return res;
     } catch (error: any) {
@@ -571,6 +572,191 @@ export class Products {
       console.error("Error deleting product", error.message);
       throw new Error(error.message);
     }
+  };
+
+  //recommendation login starts here
+  //log user events
+  logUserEvent = async (
+    userId: string | undefined,
+    productId: string,
+    eventType: string,
+    source?: string
+  ) => {
+    await this.database.createDocument(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId6,
+      ID.unique(),
+      {
+        userId,
+        productId,
+        eventType,
+        source,
+      }
+    );
+  };
+
+  //update user weights table
+  computeUserWeights = async (userId: string) => {
+    // 1️⃣ Fetch all user events
+    const events = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId6, // user_events
+      [Query.equal("userId", userId)]
+    );
+
+    // 2️⃣ Aggregate event counts
+    let impressions = 0,
+      clicks = 0,
+      favourites = 0,
+      unfavourites = 0,
+      carts = 0,
+      removes = 0;
+
+    for (const e of events.documents) {
+      switch (e.eventType) {
+        case "impression":
+          impressions++;
+          break;
+        case "click":
+          clicks++;
+          break;
+        case "favourite_add":
+        case "favourite":
+          favourites++;
+          break;
+        case "favourite_remove":
+          unfavourites++;
+          break;
+        case "add_to_cart":
+          carts++;
+          break;
+        case "remove_from_cart":
+          removes++;
+          break;
+      }
+    }
+
+    // 3️⃣ Bayesian-style smoothed weights
+    const alpha = 1; // smoothing factor
+
+    // popularity weight reflects click/cart engagement (minus removals)
+    const popularityWeight =
+      (clicks + carts + alpha) / (impressions + removes + 2 * alpha);
+
+    // favourite weight reflects positive vs negative favourite interactions
+    const favWeight =
+      (favourites - unfavourites + alpha) / (impressions + 2 * alpha);
+
+    // clamp favWeight between 0 and 1
+    const normalizedFav = Math.max(0, Math.min(1, favWeight));
+
+    // 4️⃣ Upsert into user_weights collection
+    const existing = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId7,
+      [Query.equal("userId", userId)]
+    );
+
+    if (existing.total > 0) {
+      await this.database.updateDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId7,
+        existing.documents[0].$id,
+        {
+          popularity: popularityWeight,
+          fav: normalizedFav,
+        }
+      );
+    } else {
+      await this.database.createDocument(
+        config.appwriteDatabaseId,
+        config.appwriteCollectionId7,
+        ID.unique(),
+        {
+          userId,
+          popularity: popularityWeight,
+          fav: normalizedFav,
+        }
+      );
+    }
+
+    return { popularity: popularityWeight, fav: normalizedFav };
+  };
+
+  getRecommendations = async (userId?: string) => {
+    const products = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId1
+    );
+
+    const allEvents = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId6
+    );
+
+    const productPopularity: Record<string, number> = {};
+    for (const e of allEvents.documents) {
+      if (["click", "add_to_cart"].includes(e.eventType)) {
+        productPopularity[e.productId] =
+          (productPopularity[e.productId] || 0) + 1;
+      }
+    }
+
+    const maxPopularity = Math.max(...Object.values(productPopularity), 1);
+
+    if (!userId) {
+      console.log("Showing global trending products...");
+      const scored = products.documents.map((p) => ({
+        ...p,
+        score: (productPopularity[p.$id] || 0) / maxPopularity,
+      }));
+      return scored.sort((a, b) => b.score - a.score).slice(0, 6);
+    }
+
+    // 4️⃣ Filter user favourites
+    const userFavourites = allEvents.documents
+      .filter((e) => e.userId === userId && e.eventType === "favourite_add")
+      .map((e) => e.productId);
+
+    // 5️⃣ Fetch or recompute user weights
+    let userWeights: any;
+    const cached = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId7,
+      [Query.equal("userId", userId)]
+    );
+
+    const now = Date.now();
+    const lastUpdated = cached.total
+      ? new Date(cached.documents[0].updated_at).getTime()
+      : 0;
+
+    const oneHour = 60 * 60 * 1000;
+    if (cached.total > 0 && now - lastUpdated < oneHour) {
+      userWeights = {
+        popularity: cached.documents[0].popularity,
+        fav: cached.documents[0].fav,
+      };
+    } else {
+      userWeights = await this.computeUserWeights(userId);
+    }
+
+    // 6️⃣ Compute personalized scores
+    const scored = products.documents.map((p) => {
+      const popularityScore = (productPopularity[p.$id] || 0) / maxPopularity;
+      const favouriteScore = userFavourites.includes(p.$id) ? 1 : 0;
+      const categoryScore = 1;
+
+      return {
+        ...p,
+        score:
+          popularityScore * userWeights.popularity +
+          favouriteScore * userWeights.fav +
+          categoryScore * 0.2,
+      };
+    });
+
+    return scored.sort((a, b) => b.score - a.score).slice(0, 6);
   };
 }
 

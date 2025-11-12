@@ -38,9 +38,16 @@ const CollectionCard = ({
   const [selectedFilters, setSelectedFilters] = useState<
     Record<string, string[]>
   >({});
+  const userData = useProductStore((state) => state.userData);
   const handleProductNavigation = (slug: string) => {
-    if (!isAdmin) navigate(`/p/${encodeURIComponent(slug)}`);
-    else {
+    if (!isAdmin) {
+      navigate(`/p/${encodeURIComponent(slug)}`);
+
+      //log user click event
+      (async () => {
+        await products.logUserEvent(userData?.id, data.id, "click", "shop");
+      })();
+    } else {
       navigate("/admin/add-products", { state: data });
     }
   };

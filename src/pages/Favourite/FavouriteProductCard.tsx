@@ -32,12 +32,21 @@ const FavouriteProductCard = ({ data }: FavouriteProductCardProps) => {
   const removeFavourite = async (userId: string, productId: string) => {
     try {
       await products.deleteFavourite(userId, productId);
-      const favouriteData: any = await products.getFavourites();
+      const favouriteData: any = await products.getFavourites(userId);
       setFavouriteData(favouriteData.documents);
       toast.success("Favourite removed");
     } catch (error) {
       toast.error("Failed to remove favourite");
     }
+  };
+
+  const decreaseBias = async (userId: string, productId: string) => {
+    await products.logUserEvent(
+      userId,
+      productId,
+      "favourite_remove",
+      "favourite"
+    );
   };
 
   return (
@@ -71,7 +80,10 @@ const FavouriteProductCard = ({ data }: FavouriteProductCardProps) => {
                   </AlertDialogCancel>
                   <AlertDialogAction
                     className="bg-red-600 hover:bg-black"
-                    onClick={() => removeFavourite(data.userId, data.productId)}
+                    onClick={() => {
+                      removeFavourite(data.userId, data.productId);
+                      decreaseBias(data.userId, data.productId);
+                    }}
                   >
                     Remove from Favourite
                   </AlertDialogAction>
