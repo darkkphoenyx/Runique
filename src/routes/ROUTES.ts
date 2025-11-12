@@ -11,6 +11,7 @@ export const ROUTES = {
     dPRODUCT: "/p/:slug",
     CART: "/cart",
     FAVOURITE: "/favourite",
+    FYP: "/fyp",
   },
   ADMIN: {
     PROFILE: "/admin/profile",

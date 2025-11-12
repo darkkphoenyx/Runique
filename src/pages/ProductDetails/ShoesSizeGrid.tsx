@@ -42,6 +42,10 @@ const ShoesSizeGrid = ({
     localStorage.getItem("isAdmin") || "false"
   );
 
+  //log user event
+  const logUserEvent = async (eventType: string) => {
+    await products.logUserEvent(userData?.id, productId, eventType, undefined);
+  };
   const onSubmit = async (data: FormData) => {
     if (localStorage.getItem("isLogin") !== "true") {
       navigate("/login");
@@ -63,6 +67,7 @@ const ShoesSizeGrid = ({
         Number(data.size),
         price
       );
+      logUserEvent("add_to_cart");
       toast.success("Added to bag!");
       // updating the cart items
       const cartData = await fetchCartData(userId);
@@ -77,12 +82,13 @@ const ShoesSizeGrid = ({
 
   const addToFavourite = async (userId: string, productId: string) => {
     try {
+      if (!userId) navigate("/login");
       if (isAdminLoggedIn) throw new Error("Unauthorized for Admin.");
       const res = await products.addToFavourite(userId, productId);
 
       if (res === 409) toast.error("Already added");
       else if (res === 201) {
-        const favouriteData: any = await products.getFavourites();
+        const favouriteData: any = await products.getFavourites(userId);
         setFavouriteData(favouriteData.documents);
         toast.success("Added to Favourite");
       } else throw new Error("Failed to Add");
@@ -144,7 +150,10 @@ const ShoesSizeGrid = ({
 
       {/* add to favourite button */}
       <button
-        onClick={() => addToFavourite(userId, productId)}
+        onClick={() => {
+          addToFavourite(userId, productId);
+          logUserEvent("favourite");
+        }}
         type="button"
         className="bg-white hover:bg-red-600 hover:text-white  text-black border border-black hover:border-red-600 text-sm py-3.5 rounded-md font-medium transition-all active:scale-98 cursor-pointer w-full outline-none"
       >

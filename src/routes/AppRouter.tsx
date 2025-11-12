@@ -18,6 +18,7 @@ import NotFound from "@/components/openRoutes/NotFound";
 import Products from "@/pages/Admin/Products/Products";
 import AddProduct from "@/pages/Admin/Products/AddProduct";
 import Profile from "@/pages/Admin/Profile/Profile";
+import Fyp from "@/pages/FYP/Fyp";
 
 const AppRouter = () => {
   return (
@@ -32,6 +33,7 @@ const AppRouter = () => {
           <Route element={<ScrollWrapper />}>
             <Route path={ROUTES.USER.ABOUT} element={<About />} />
             <Route path={ROUTES.USER.SHOP} element={<CollectionWrapper />} />
+            <Route path={ROUTES.USER.FYP} element={<Fyp />} />
             <Route
               path={ROUTES.USER.dPRODUCT}
               element={<ProductDetailWrapper />}
