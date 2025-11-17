@@ -1,54 +1,40 @@
-// import fetch from "node-fetch";
+import fetch from "node-fetch";
 
-// export default async function (req) {
-//   // 1️⃣ Parse the request payload exactly how your platform expects
-//   let body;
-//   try {
-//     if (!req.payload) throw new Error("No payload found");
-//     body = JSON.parse(req.payload); // req.payload is the JSON string sent
-//   } catch (err) {
-//     return { status: 400, body: { error: "Invalid JSON in request body" } };
-//   }
+export default async function ({ req, res, log, error }) {
+  let body;
 
-//   // 2️⃣ Validate Khalti key
-//   const KHALTI_KEY = String(process.env.VITE_KHALTI_PRIVATE_KEY || "").trim();
-//   if (!KHALTI_KEY) {
-//     return { status: 500, body: { error: "Khalti private key not set" } };
-//   }
+  // 1️⃣ Parse JSON safely
+  try {
+    body = JSON.parse(req); // req is the raw JSON string sent by Postman
+  } catch (err) {
+    return res.json({ error: "Invalid JSON in request body" }, 400);
+  }
 
-//   // 3️⃣ Call Khalti API
-//   try {
-//     const khaltiRes = await fetch(
-//       "https://khalti.com/api/v2/epayment/initiate/",
-//       {
-//         method: "POST",
-//         headers: {
-//           Authorization: `Key ${KHALTI_KEY}`,
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(body),
-//       }
-//     );
+  // 2️⃣ Validate Khalti key
+  const KHALTI_KEY = String(process.env.VITE_KHALTI_PRIVATE_KEY || "").trim();
+  if (!KHALTI_KEY) {
+    return res.json({ error: "Khalti private key not set" }, 500);
+  }
 
-//     const data = await khaltiRes.json();
+  // 3️⃣ Call Khalti API
+  try {
+    const khaltiRes = await fetch(
+      "https://khalti.com/api/v2/epayment/initiate/",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Key ${KHALTI_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: req, // send exactly what was received
+      }
+    );
 
-//     return { status: khaltiRes.status, body: data };
-//   } catch (err) {
-//     return { status: 500, body: { error: "Failed to call Khalti API" } };
-//   }
-// }
+    const data = await khaltiRes.json();
 
-// functions/khalti/main.js
-
-export default async function (req) {
-  // 🔹 Debug: log the request object
-  console.log("REQ OBJECT:", req);
-
-  // 🔹 Return the keys of the request object so we can see what exists
-  return {
-    status: 200,
-    body: {
-      keys: Object.keys(req),
-    },
-  };
+    return res.json(data, khaltiRes.status);
+  } catch (err) {
+    error(err);
+    return res.json({ error: "Failed to call Khalti API" }, 500);
+  }
 }
