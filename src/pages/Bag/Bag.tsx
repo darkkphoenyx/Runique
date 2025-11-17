@@ -38,6 +38,9 @@ const Bag = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(0);
 
+  const publickey = import.meta.env.VITE_KHALTI_PUBLIC_KEY;
+  console.log("public ", publickey);
+
   useEffect(() => {
     const totalQuantity = bagData
       .filter((item) => selectedItems.includes(item.id))
@@ -61,16 +64,45 @@ const Bag = () => {
 
   const proceedToCheckout = () => {
     const config = {
-      publicKey: import.meta.env.VITE_KHALTI_PUBLIC_KEY,
+      publicKey: import.meta.env.VITE_KHALTI_PUBLIC_KEY, // your public key
       productIdentity: "12345",
       productName: "Khalti Logo",
       productUrl: "http://localhost:5173/cart",
-      amount: 1300,
+      amount: 1300, // in paisa
       eventHandler: {
-        onSuccess: async (payload: any) => {
-          console.log("Payment success payload:", payload);
+        // <— this is where your onSuccess goes
+        onSuccess: async (widgetPayload: any) => {
+          console.log("Widget success:", widgetPayload);
 
-          // Call Appwrite server function
+          const apiPayload = {
+            return_url: "http://localhost:5173",
+            website_url: "http://localhost:5173",
+            amount: 1300,
+            purchase_order_id: "test12",
+            purchase_order_name: "test",
+            customer_info: {
+              name: "Khalti Bahadur",
+              email: "example@gmail.com",
+              phone: "9800000123",
+            },
+            amount_breakdown: [
+              { label: "Mark Price", amount: 1000 },
+              { label: "VAT", amount: 300 },
+            ],
+            product_details: [
+              {
+                identity: "1234567890",
+                name: "Khalti logo",
+                total_price: 1300,
+                quantity: 1,
+                unit_price: 1300,
+              },
+            ],
+            merchant_username: "merchant_name",
+            merchant_extra: "merchant_extra",
+            token: widgetPayload.token,
+          };
+
           try {
             const response = await fetch(
               "https://691ac67b000b5b641933.syd.appwrite.run/v2/functions/khaltiInitiate",
@@ -78,8 +110,9 @@ const Bag = () => {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
+                  "X-Appwrite-Project": "YOUR_PROJECT_ID_HERE",
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(apiPayload),
               }
             );
 
@@ -95,7 +128,7 @@ const Bag = () => {
     };
 
     const checkout = new (window as any).KhaltiCheckout(config);
-    checkout.show();
+    checkout.show(); // opens the widget
   };
 
   const toggleSelect = (id: string) => {

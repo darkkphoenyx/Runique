@@ -49,20 +49,18 @@ import fetch from "node-fetch";
 export default async function ({ req, res, log, error }) {
   let body;
 
-  // 1️⃣ Parse request safely
   try {
     body = typeof req === "string" ? JSON.parse(req) : req;
   } catch (err) {
     return res.json({ error: "Invalid JSON in request body" }, 400);
   }
 
-  // 2️⃣ Read private key from env
-  const KHALTI_KEY = process.env.VITE_KHALTI_SECRET_KEY?.trim();
+  const KHALTI_KEY = process.env.KHALTI_SECRET_KEY?.trim();
+
   if (!KHALTI_KEY)
     return res.json({ error: "Khalti private key not set" }, 500);
 
   try {
-    // 3️⃣ Call Khalti initiate API
     const khaltiRes = await fetch(
       "https://khalti.com/api/v2/epayment/initiate/",
       {
