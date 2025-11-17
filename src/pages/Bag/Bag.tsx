@@ -64,31 +64,27 @@ const Bag = () => {
 
   const proceedToCheckout = () => {
     const config = {
-      publicKey: import.meta.env.VITE_KHALTI_PUBLIC_KEY, // your public key
+      publicKey: import.meta.env.VITE_KHALTI_PUBLIC_KEY, // sandbox public key
       productIdentity: "12345",
       productName: "Khalti Logo",
       productUrl: "http://localhost:5173/cart",
       amount: 1300, // in paisa
       eventHandler: {
-        // <— this is where your onSuccess goes
         onSuccess: async (widgetPayload: any) => {
           console.log("Widget success:", widgetPayload);
 
+          // Prepare full payload for server
           const apiPayload = {
-            return_url: "http://localhost:5173",
+            return_url: "http://localhost:5173/payment-success",
             website_url: "http://localhost:5173",
             amount: 1300,
             purchase_order_id: "test12",
-            purchase_order_name: "test",
+            purchase_order_name: "Khalti Logo",
             customer_info: {
               name: "Khalti Bahadur",
               email: "example@gmail.com",
               phone: "9800000123",
             },
-            amount_breakdown: [
-              { label: "Mark Price", amount: 1000 },
-              { label: "VAT", amount: 300 },
-            ],
             product_details: [
               {
                 identity: "1234567890",
@@ -98,19 +94,18 @@ const Bag = () => {
                 unit_price: 1300,
               },
             ],
-            merchant_username: "merchant_name",
-            merchant_extra: "merchant_extra",
-            token: widgetPayload.token,
+            token: widgetPayload.token, // token from widget
           };
 
+          // Call Appwrite server function
           try {
             const response = await fetch(
-              "https://691ac67b000b5b641933.syd.appwrite.run/v2/functions/khaltiInitiate",
+              "https://<YOUR_APPWRITE_ENDPOINT>/v1/functions/khaltiInitiate/executions",
               {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  "X-Appwrite-Project": "YOUR_PROJECT_ID_HERE",
+                  "X-Appwrite-Project": "<YOUR_PROJECT_ID>",
                 },
                 body: JSON.stringify(apiPayload),
               }
@@ -128,7 +123,7 @@ const Bag = () => {
     };
 
     const checkout = new (window as any).KhaltiCheckout(config);
-    checkout.show(); // opens the widget
+    checkout.show();
   };
 
   const toggleSelect = (id: string) => {
