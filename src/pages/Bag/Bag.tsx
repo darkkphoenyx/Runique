@@ -59,6 +59,14 @@ const Bag = () => {
     })();
   });
 
+  const proceedToCheckout = async () => {
+    try {
+      console.log("inside");
+    } catch (error) {
+      console.error("Payment failed");
+    }
+  };
+
   const toggleSelect = (id: string) => {
     setSelectedItems((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -290,11 +298,14 @@ const Bag = () => {
 
             <Separator />
 
-            <SecondaryButton
+            {/* proceed to checkout button */}
+            <button
+              onClick={proceedToCheckout}
               disabled={selectedItems.length <= 0}
-              title="Proceed to Checkout"
-              className="border rounded-full py-6"
-            />
+              className=" bg-black hover:bg-white mt-6 rounded-full font-medium active:scale-[98%] hover:text-black text-white border-black transition-all cursor-pointer border py-4"
+            >
+              Proceed to Checkout
+            </button>
           </div>
         </div>
       </div>

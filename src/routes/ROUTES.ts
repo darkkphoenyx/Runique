@@ -14,6 +14,7 @@ export const ROUTES = {
     FYP: "/fyp",
   },
   ADMIN: {
+    DASHBOARD:"/admin/dashboard",
     PROFILE: "/admin/profile",
     PRODUCTS: "/admin/products",
     ADD_PRODUCTS: "/admin/add-products",
