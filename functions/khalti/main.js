@@ -1,24 +1,30 @@
-export default async function (req) {
-  let body;
+import fetch from "node-fetch";
 
+export default async function (req) {
+  // 1️⃣ Parse request body safely
+  let body;
   try {
-    // If platform provides req.json() use it
-    if (typeof req.json === "function") {
+    if ("body" in req && req.body) {
+      body = req.body;
+    } else if (typeof req.json === "function") {
       body = await req.json();
-    } else {
-      // fallback: read raw text and parse
+    } else if (typeof req.text === "function") {
       const raw = await req.text();
       body = JSON.parse(raw);
+    } else {
+      throw new Error("No request body found");
     }
   } catch (err) {
     return { status: 400, body: { error: "Invalid JSON in request body" } };
   }
 
-  const KHALTI_KEY = String(process.env.VITE_KHALTI_PRIVATE_KEY || "");
+  // 2️⃣ Get Khalti key from environment
+  const KHALTI_KEY = String(process.env.VITE_KHALTI_PRIVATE_KEY || "").trim();
   if (!KHALTI_KEY) {
     return { status: 500, body: { error: "Khalti private key not set" } };
   }
 
+  // 3️⃣ Call Khalti API
   try {
     const khaltiRes = await fetch(
       "https://khalti.com/api/v2/epayment/initiate/",
@@ -33,6 +39,7 @@ export default async function (req) {
     );
 
     const data = await khaltiRes.json();
+
     return { status: khaltiRes.status, body: data };
   } catch (err) {
     return { status: 500, body: { error: "Failed to call Khalti API" } };
