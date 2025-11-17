@@ -1,8 +1,15 @@
 export default async function (req) {
-  // Parse body safely
   let body;
+
   try {
-    body = req.body ?? JSON.parse(await req.text());
+    // If platform provides req.json() use it
+    if (typeof req.json === "function") {
+      body = await req.json();
+    } else {
+      // fallback: read raw text and parse
+      const raw = await req.text();
+      body = JSON.parse(raw);
+    }
   } catch (err) {
     return { status: 400, body: { error: "Invalid JSON in request body" } };
   }
@@ -26,7 +33,6 @@ export default async function (req) {
     );
 
     const data = await khaltiRes.json();
-
     return { status: khaltiRes.status, body: data };
   } catch (err) {
     return { status: 500, body: { error: "Failed to call Khalti API" } };
