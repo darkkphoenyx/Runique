@@ -59,12 +59,43 @@ const Bag = () => {
     })();
   });
 
-  const proceedToCheckout = async () => {
-    try {
-      console.log("inside");
-    } catch (error) {
-      console.error("Payment failed");
-    }
+  const proceedToCheckout = () => {
+    const config = {
+      publicKey: import.meta.env.VITE_KHALTI_PUBLIC_KEY,
+      productIdentity: "12345",
+      productName: "Khalti Logo",
+      productUrl: "http://localhost:5173/cart",
+      amount: 1300,
+      eventHandler: {
+        onSuccess: async (payload: any) => {
+          console.log("Payment success payload:", payload);
+
+          // Call Appwrite server function
+          try {
+            const response = await fetch(
+              "https://691ac67b000b5b641933.syd.appwrite.run/v2/functions/khaltiInitiate",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+              }
+            );
+
+            const data = await response.json();
+            console.log("Server response:", data);
+          } catch (err) {
+            console.error("Server function call failed:", err);
+          }
+        },
+        onError: (err: any) => console.error("Payment error:", err),
+        onClose: () => console.log("Widget closed"),
+      },
+    };
+
+    const checkout = new (window as any).KhaltiCheckout(config);
+    checkout.show();
   };
 
   const toggleSelect = (id: string) => {

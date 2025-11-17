@@ -845,7 +845,6 @@ export class Products {
   };
 
   // khalti payment integration
-
   khaltiPayment = async () => {
     const payload = {
       return_url: "https://example.com/payment/",
