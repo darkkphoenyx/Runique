@@ -1,35 +1,33 @@
 import fetch from "node-fetch";
 
-export default async function (req) {
-  // 1️⃣ Parse payload correctly
+export default async function (req, res) {
   let body;
   try {
-    if (!req.payload) throw new Error("No payload found");
-    body = JSON.parse(req.payload);
+    body = req.bodyJson; // ✅ Appwrite automatically parses JSON
+    if (!body) throw new Error("No JSON body");
   } catch (err) {
-    return { status: 400, body: { error: "Invalid JSON in request body" } };
+    return res.json({ error: "Invalid JSON in request body" }, 400);
   }
 
-  // 2️⃣ Validate Khalti key
-  const KHALTI_KEY = String(process.env.VITE_KHALTI_PRIVATE_KEY || "").trim();
-  if (!KHALTI_KEY) {
-    return { status: 500, body: { error: "Khalti private key not set" } };
-  }
+  const KHALTI_KEY = process.env.VITE_KHALTI_PRIVATE_KEY;
+  if (!KHALTI_KEY) return res.json({ error: "Khalti key not set" }, 500);
 
-  // 3️⃣ Call Khalti
   try {
-    const res = await fetch("https://khalti.com/api/v2/epayment/initiate/", {
-      method: "POST",
-      headers: {
-        Authorization: `Key ${KHALTI_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
+    const khaltiRes = await fetch(
+      "https://khalti.com/api/v2/epayment/initiate/",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Key ${KHALTI_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    );
 
-    return { status: res.status, body: data };
+    const data = await khaltiRes.json();
+    return res.json(data, khaltiRes.status);
   } catch (err) {
-    return { status: 500, body: { error: "Failed to call Khalti API" } };
+    return res.json({ error: "Failed to call Khalti API" }, 500);
   }
 }
