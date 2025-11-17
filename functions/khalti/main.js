@@ -1,7 +1,5 @@
-import fetch from "node-fetch";
-
 export default async function (req, res) {
-  const body = JSON.parse(req.payload);
+  const body = req.body; // already parsed JSON
 
   const khaltiRes = await fetch(
     "https://khalti.com/api/v2/epayment/initiate/",
