@@ -1,19 +1,15 @@
-export default async function (req, res) {
+export default async function (req) {
   // Parse body safely
   let body;
   try {
     body = req.body ?? JSON.parse(await req.text());
   } catch (err) {
-    res.statusCode = 400;
-    res.setHeader("Content-Type", "application/json");
-    return res.end(JSON.stringify({ error: "Invalid JSON in request body" }));
+    return { status: 400, body: { error: "Invalid JSON in request body" } };
   }
 
   const KHALTI_KEY = String(process.env.VITE_KHALTI_PRIVATE_KEY || "");
   if (!KHALTI_KEY) {
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json");
-    return res.end(JSON.stringify({ error: "Khalti private key not set" }));
+    return { status: 500, body: { error: "Khalti private key not set" } };
   }
 
   try {
@@ -30,12 +26,9 @@ export default async function (req, res) {
     );
 
     const data = await khaltiRes.json();
-    res.statusCode = khaltiRes.status;
-    res.setHeader("Content-Type", "application/json");
-    return res.end(JSON.stringify(data));
+
+    return { status: khaltiRes.status, body: data };
   } catch (err) {
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json");
-    return res.end(JSON.stringify({ error: "Failed to call Khalti API" }));
+    return { status: 500, body: { error: "Failed to call Khalti API" } };
   }
 }
