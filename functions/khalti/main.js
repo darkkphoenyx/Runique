@@ -1,5 +1,5 @@
-export default async function (req, res) {
-  const body = req.body; // already parsed JSON
+export default async function (req) {
+  const body = req.body; // or parse text if needed
 
   const khaltiRes = await fetch(
     "https://khalti.com/api/v2/epayment/initiate/",
@@ -14,5 +14,8 @@ export default async function (req, res) {
   );
 
   const data = await khaltiRes.json();
-  res.json(data);
+
+  return new Response(JSON.stringify(data), {
+    headers: { "Content-Type": "application/json" },
+  });
 }
