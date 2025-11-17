@@ -3,9 +3,13 @@ import fetch from "node-fetch";
 export default async function ({ req, res, log, error }) {
   let body;
 
-  // 1️⃣ Parse JSON safely
+  // 1️⃣ Handle body correctly
   try {
-    body = JSON.parse(req); // req is the raw JSON string sent by Postman
+    if (typeof req === "string") {
+      body = JSON.parse(req); // raw string → object
+    } else {
+      body = req; // already an object
+    }
   } catch (err) {
     return res.json({ error: "Invalid JSON in request body" }, 400);
   }
@@ -26,7 +30,7 @@ export default async function ({ req, res, log, error }) {
           Authorization: `Key ${KHALTI_KEY}`,
           "Content-Type": "application/json",
         },
-        body: req, // send exactly what was received
+        body: JSON.stringify(body), // always send a proper JSON string
       }
     );
 
