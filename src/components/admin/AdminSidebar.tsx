@@ -1,4 +1,4 @@
-import { Database, User } from "lucide-react";
+import { Database, House, User } from "lucide-react";
 
 import {
   Sidebar,
@@ -13,6 +13,7 @@ import { ROUTES } from "@/routes/ROUTES";
 import { NavLink } from "react-router-dom";
 
 const items = [
+  { title: "Dashboard", url: ROUTES.ADMIN.DASHBOARD, icon: House },
   { title: "Products", url: ROUTES.ADMIN.PRODUCTS, icon: Database },
   { title: "Profile", url: ROUTES.ADMIN.PROFILE, icon: User },
 ];

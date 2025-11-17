@@ -1,4 +1,4 @@
-import { Client, Databases, ID, Query, Storage } from "appwrite";
+import { Client, Databases, Functions, ID, Query, Storage } from "appwrite";
 import config from "../config/config";
 import bcrypt from "bcryptjs";
 
@@ -15,6 +15,7 @@ export class Products {
     this.storage = new Storage(this.client);
   }
 
+  functions = new Functions(this.client);
   // Services logic
 
   //login
@@ -597,14 +598,14 @@ export class Products {
 
   //update user weights table
   computeUserWeights = async (userId: string) => {
-    // 1️⃣ Fetch all user events
+    // Fetch all user events
     const events = await this.database.listDocuments(
       config.appwriteDatabaseId,
       config.appwriteCollectionId6, // user_events
       [Query.equal("userId", userId)]
     );
 
-    // 2️⃣ Aggregate event counts
+    // Aggregate event counts
     let impressions = 0,
       clicks = 0,
       favourites = 0,
@@ -636,7 +637,7 @@ export class Products {
       }
     }
 
-    // 3️⃣ Bayesian-style smoothed weights
+    // Bayesian-style smoothed weights
     const alpha = 1; // smoothing factor
 
     // popularity weight reflects click/cart engagement (minus removals)
@@ -650,7 +651,7 @@ export class Products {
     // clamp favWeight between 0 and 1
     const normalizedFav = Math.max(0, Math.min(1, favWeight));
 
-    // 4️⃣ Upsert into user_weights collection
+    // Upsert into user_weights collection
     const existing = await this.database.listDocuments(
       config.appwriteDatabaseId,
       config.appwriteCollectionId7,
@@ -713,12 +714,12 @@ export class Products {
       return scored.sort((a, b) => b.score - a.score).slice(0, 6);
     }
 
-    // 4️⃣ Filter user favourites
+    // Filter user favourites
     const userFavourites = allEvents.documents
       .filter((e) => e.userId === userId && e.eventType === "favourite_add")
       .map((e) => e.productId);
 
-    // 5️⃣ Fetch or recompute user weights
+    // Fetch or recompute user weights
     let userWeights: any;
     const cached = await this.database.listDocuments(
       config.appwriteDatabaseId,
@@ -741,7 +742,7 @@ export class Products {
       userWeights = await this.computeUserWeights(userId);
     }
 
-    // 6️⃣ Compute personalized scores
+    // Compute personalized scores
     const scored = products.documents.map((p) => {
       const popularityScore = (productPopularity[p.$id] || 0) / maxPopularity;
       const favouriteScore = userFavourites.includes(p.$id) ? 1 : 0;
@@ -757,6 +758,129 @@ export class Products {
     });
 
     return scored.sort((a, b) => b.score - a.score).slice(0, 6);
+  };
+
+  //get trending products
+  getTrendingProductsGraph = async () => {
+    const products = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId1
+    );
+
+    const allEvents = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId6
+    );
+
+    const popularity: Record<string, number> = {};
+    for (const e of allEvents.documents) {
+      if (["click", "add_to_cart"].includes(e.eventType)) {
+        popularity[e.productId] = (popularity[e.productId] || 0) + 1;
+      }
+    }
+
+    // Map into chart-friendly format
+    const chartData = products.documents.map((p) => {
+      const productName = p.title ?? (p as any).fields?.title ?? p.$id;
+      return {
+        name: productName,
+        value: popularity[p.$id] || 0,
+      };
+    });
+    return chartData;
+  };
+
+  //get frequently purchased
+  getBestSellers = async () => {
+    const events = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId6,
+      [Query.equal("eventType", "add_to_cart")]
+    );
+
+    const counts: Record<string, number> = {};
+    for (const e of events.documents) {
+      counts[e.productId] = (counts[e.productId] || 0) + 1;
+    }
+
+    const max = Math.max(...Object.values(counts), 1);
+    const products = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId1
+    );
+
+    const scored = products.documents.map((p) => ({
+      ...p,
+      score: (counts[p.$id] || 0) / max,
+    }));
+
+    return scored.sort((a, b) => b.score - a.score).slice(0, 6);
+  };
+
+  //get most favourite product
+  getMostFavourited = async () => {
+    const events = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId6,
+      [Query.equal("eventType", "favourite_add")]
+    );
+
+    const counts: Record<string, number> = {};
+    for (const e of events.documents) {
+      counts[e.productId] = (counts[e.productId] || 0) + 1;
+    }
+
+    const max = Math.max(...Object.values(counts), 1);
+    const products = await this.database.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteCollectionId1
+    );
+
+    const scored = products.documents.map((p) => ({
+      ...p,
+      score: (counts[p.$id] || 0) / max,
+    }));
+
+    return scored.sort((a, b) => b.score - a.score).slice(0, 6);
+  };
+
+  // khalti payment integration
+
+  khaltiPayment = async () => {
+    const payload = {
+      return_url: "https://example.com/payment/",
+      website_url: "https://example.com/",
+      amount: 1300,
+      purchase_order_id: "test12",
+      purchase_order_name: "test",
+      customer_info: {
+        name: "Khalti Bahadur",
+        email: "example@gmail.com",
+        phone: "9800000123",
+      },
+      amount_breakdown: [
+        { label: "Mark Price", amount: 1000 },
+        { label: "VAT", amount: 300 },
+      ],
+      product_details: [
+        {
+          identity: "1234567890",
+          name: "Khalti logo",
+          total_price: 1300,
+          quantity: 1,
+          unit_price: 1300,
+        },
+      ],
+      merchant_username: "merchant_name",
+      merchant_extra: "merchant_extra",
+    };
+
+    const response = await this.functions.createExecution(
+      "[FUNCTION_ID]",
+      JSON.stringify(payload)
+    );
+
+    console.log(response);
   };
 }
 
