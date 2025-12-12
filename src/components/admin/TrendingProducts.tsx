@@ -6,7 +6,7 @@ export default function TrendingProducts() {
 
   useEffect(() => {
     (async () => {
-      const res = await products.getTrendingProducts();
+      const res = await products.getTrendingProductsGraph();
       setTrendingProducts(res);
     })();
   }, []);
