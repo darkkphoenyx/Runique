@@ -11,7 +11,6 @@ import { CircleQuestionMark, Trash2 } from "lucide-react";
 import BagProductCard from "./BagProductCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import Footer from "@/components/footer/Footer";
-import SecondaryButton from "@/components/buttons/SecondaryButton";
 import products from "@/appwrite/APIs";
 import { fetchCartData } from "@/utils/FetchCartItem";
 import { toast } from "sonner";
@@ -37,9 +36,6 @@ const Bag = () => {
 
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(0);
-
-  const publickey = import.meta.env.VITE_KHALTI_PUBLIC_KEY;
-  console.log("public ", publickey);
 
   useEffect(() => {
     const totalQuantity = bagData
@@ -237,8 +233,8 @@ const Bag = () => {
         {/* LEFT SIDE - BAG ITEMS */}
 
         {bagData.length > 0 ? (
-          <div className="flex gap-4 flex-col col-span-2 max-lg:overflow-y-scroll max-lg:max-h-[370px]">
-            <div className="max-lg:sticky top-0 bg-white flex border p-2 gap-2 items-center text-black/50 uppercase text-sm ">
+          <div className="flex gap-4 flex-col col-span-2 lg:min-h-full md:min-h-[500px] overflow-y-scroll min-h-[350px] max-h-[450px] h-full">
+            <div className="max-lg:sticky top-0 bg-white flex border p-2 gap-2 items-center text-black/50 uppercase text-sm">
               <Checkbox
                 checked={isAllSelected}
                 onCheckedChange={toggleSelectAll}
@@ -415,15 +411,17 @@ const Bag = () => {
 
           <Separator />
 
-          <SecondaryButton
+          <button
+            onClick={proceedToCheckout}
             disabled={selectedItems.length <= 0}
-            title="Proceed to Checkout"
-            className="border rounded-full py-6"
-          />
+            className=" bg-black hover:bg-white mt-6 rounded-full font-medium active:scale-[98%] hover:text-black text-white border-black transition-all cursor-pointer border py-4"
+          >
+            Proceed to Checkout
+          </button>
         </div>
       </div>
 
-      <div className="hidden lg:block mt-auto">
+      <div className="hidden lg:block md:mt-20 mt-auto">
         <Footer />
       </div>
     </div>

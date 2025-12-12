@@ -38,7 +38,7 @@ const AdminDashboard = () => {
       <ProductBarChart data={trending} title="Trending Products" />
       <div className="grid lg:grid-cols-2 lg:mt-20 mt-14 lg:gap-10 max-lg:gap-y-14">
         <div className="shadow-2xl p-2">
-          <h2 className="font-medium text-2xl mb-4">Best Selling Items</h2>
+          <h2 className="font-medium text-2xl mb-4 p-2">Best Selling Items</h2>
           <div className="grid lg:grid-cols-2 grid-cols-2 gap-4">
             {bestSellers.map((product, idx) => (
               <ProductCard key={idx} data={product} />
@@ -46,7 +46,7 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="shadow-2xl p-2">
-          <h2 className="font-medium text-2xl mb-4">Most Favourite Items</h2>
+          <h2 className="font-medium text-2xl mb-4 p-2">Most Favourite Items</h2>
           <div className="grid lg:grid-cols-2 grid-cols-2 gap-2">
             {recommended.map((product, idx) => (
               <ProductCard key={idx} data={product} />
