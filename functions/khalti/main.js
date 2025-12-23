@@ -56,6 +56,7 @@ export default async function ({ req, res, log, error }) {
   }
 
   const KHALTI_KEY = process.env.KHALTI_SECRET_KEY?.trim();
+  console.log("khalti key", KHALTI_KEY);
 
   if (!KHALTI_KEY)
     return res.json({ error: "Khalti private key not set" }, 500);
