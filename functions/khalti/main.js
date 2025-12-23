@@ -79,7 +79,7 @@ export default async function ({ req, res, log, error }) {
     return res.json(data, khaltiRes.status);
   } catch (err) {
     error(err);
-    return res.json({ error: "Failed to call Khalti API" }, 500);
+    return res.json({ error: "This is error" }, 500);
   }
 }
 
